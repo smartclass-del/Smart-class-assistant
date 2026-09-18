@@ -3,59 +3,131 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SMART CLASS ASSISTANT - Level 5 IT</title>
+<title>SMART CLASS V2 - My Account</title>
 <style>
 body{font-family:Arial;background:#f0f2f5;margin:0;padding:10px}
 .header{background:#0a3d62;color:white;padding:15px;border-radius:12px;text-align:center}
-.alert{background:#f6e58d;padding:10px;border-radius:8px;margin:10px 0;border-left:5px solid #f9ca24}
 .card{background:white;padding:15px;border-radius:12px;margin:10px 0;box-shadow:0 2px 5px rgba(0,0,0,0.1)}
-.badge{padding:3px 8px;border-radius:10px;color:white;font-size:12px}
-.green{background:#27ae60} .red{background:#c0392b}
-.btn{background:#0a3d62;color:white;padding:10px 15px;border:none;border-radius:8px;width:100%;margin-top:10px}
-table{width:100%;border-collapse:collapse}
-th,td{padding:8px;text-align:left;border-bottom:1px solid #ddd;font-size:14px}
+.btn{background:#0a3d62;color:white;padding:12px;border:none;border-radius:8px;width:100%;margin-top:10px;font-weight:bold}
+input{width:95%;padding:10px;margin:5px 0;border-radius:8px;border:1px solid #ccc}
+.badge{padding:4px 10px;border-radius:10px;color:white;font-size:12px}
+.hidden{display:none}
+.today-class{border-left:5px solid #27ae60;background:#eafaf1}
 </style>
 </head>
 <body>
+
+<div id="loginPage" class="card">
+<h2 style="text-align:center">SMART CLASS - Ingia</h2>
+<p style="text-align:center;font-size:13px">Kila mwanafunzi ajisajili na akaunti yake</p>
+<input id="regName" placeholder="Jina Kamili - mfano: Juma Kassim">
+<input id="regPass" type="password" placeholder="Password yako - mfano: 1234">
+<button class="btn" onclick="register()">JISAJILI / INGIA</button>
+<p style="font-size:11px;text-align:center;margin-top:10px;color:gray">Ukisajili mara moja, simu itakukumbuka daima</p>
+</div>
+
+<div id="mainPage" class="hidden">
 <div class="header">
-<h2>SMART CLASS ASSISTANT</h2>
-<p>Level 5 IT - NACTVET | Mtihani: Siku 89</p>
-<p>18/20 Wanafunzi - 90% Tayari</p>
+<h2 id="welcomeText">Habari!</h2>
+<p id="todayDate">Leo ni...</p>
+<p><span id="myPercent">90%</span> Mahudhurio Yako</p>
+<button onclick="logout()" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:5px 10px;border-radius:5px;font-size:11px;margin-top:10px">Toka (Logout)</button>
 </div>
-<div class="alert">
-<b>Tangazo la Bweni:</b> Maji bweni la 3 yamekatika leo. Tumia bweni la 2. Nauli 500 TZS.
+
+<div class="card" id="todayCard">
+<h3 id="todayTitle">Vipindi Vya Leo</h3>
+<div id="todayList">Inapakia...</div>
+<button class="btn" onclick="markNipo()">NIPO DARASANI LEO ✅</button>
+<p id="nipoMsg" style="text-align:center;color:green;font-weight:bold"></p>
 </div>
+
 <div class="card">
-<h3>Mahudhurio Leo - Database 8:00 AM</h3>
-<table>
-<tr><th>Jina</th><th>Mahudhurio</th><th>Hali</th></tr>
-<tr><td>Juma Kassim</td><td>18/20</td><td><span class="badge green">90% Anaingia</span></td></tr>
-<tr><td>Asha Hamis</td><td>14/20</td><td><span class="badge red">70% HATARI</span></td></tr>
-<tr><td>Baraka John</td><td>20/20</td><td><span class="badge green">100% Anaingia</span></td></tr>
-</table>
-<button class="btn">Mark NIPO Leo</button>
+<h3>Tangazo</h3>
+<p>Maji bweni la 3 yamekatika. Tumia bweni la 2.</p>
 </div>
+
 <div class="card">
-<h3>Ratiba ya Wiki & Mtihani</h3>
-<p><b>Jumatatu:</b> 8:00-10:00 - Database Lab - Lab 2</p>
-<p><b>Jumanne:</b> 10:00-12:00 - Calculus - LH 3</p>
-<p style="background:#ffeb;padding:8px;border-radius:5px;color:#c0392b"><b>IJUMAA:</b> 8:00 AM - MTIHANI WA MWISHO - Hall A</p>
-</div>
-<div class="card">
-<h3>E-Library - Pakua Notes</h3>
+<h3>E-Library Yako</h3>
 <p>Calculus.pdf - Pakua</p>
-<p>Database-Notes.pdf - Pakua</p>
-<p>Past Papers - Pakua</p>
+<p>Database.pdf - Pakua</p>
 </div>
-<div class="card">
-<h3>Wasiliana na Walimu</h3>
-<p>Mr. Said (Database) - 0712xxxxxx</p>
-<p>Madam Jane (Calculus) - 0754xxxxxx</p>
 </div>
-<div class="card" style="text-align:center">
-<h3>QR Code ya HOD</h3>
-<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://smartclass-del.github.io/Smart-class-assistant/" alt="QR">
-<p style="font-size:11px">https://smartclass-del.github.io/Smart-class-assistant/</p>
-</div>
+
+<script>
+// RATIBA HALISI - Badilisha hapa kulingana na darasa lako
+const ratiba = {
+0: [{somo:"Mapumziko - Hakuna Masomo",muda:"Leo ni Jumapili",chumba:"Nyumbani"}],
+1: [{somo:"Database Lab",muda:"8:00-10:00",chumba:"Lab 2"}, {somo:"English",muda:"11:00-13:00",chumba:"LH 1"}],
+2: [{somo:"Calculus",muda:"10:00-12:00",chumba:"LH 3"}],
+3: [{somo:"Networking",muda:"8:00-10:00",chumba:"Lab 1"}, {somo:"Programming",muda:"14:00-16:00",chumba:"Lab 2"}],
+4: [{somo:"System Analysis",muda:"9:00-11:00",chumba:"LH 2"}],
+5: [{somo:"MTIHANI WA MWISHO",muda:"8:00 AM",chumba:"Hall A"}],
+6: [{somo:"Mapumziko - Soma Mtihani",muda:"Jumamosi",chumba:"Library"}]
+};
+
+const siku = ["Jumapili","Jumatatu","Jumanne","Jumatano","Alhamisi","Ijumaa","Jumamosi"];
+
+function register(){
+let name=document.getElementById('regName').value;
+let pass=document.getElementById('regPass').value;
+if(name.length<3){alert("Weka jina kamili");return;}
+localStorage.setItem('sc_name',name);
+localStorage.setItem('sc_pass',pass);
+if(!localStorage.getItem('sc_att_'+name)){localStorage.setItem('sc_att_'+name,0); localStorage.setItem('sc_total_'+name,0);}
+showMain();
+}
+
+function showMain(){
+let name=localStorage.getItem('sc_name');
+if(!name){return;}
+document.getElementById('loginPage').classList.add('hidden');
+document.getElementById('mainPage').classList.remove('hidden');
+document.getElementById('welcomeText').innerText="Habari, "+name+"!";
+
+let leo = new Date();
+let sikuNum = leo.getDay();
+let jinaSiku = siku[sikuNum];
+document.getElementById('todayDate').innerText="Leo ni "+jinaSiku+" - "+leo.toLocaleDateString('sw-TZ');
+document.getElementById('todayTitle').innerText="Vipindi vya Leo - "+jinaSiku+" ("+ratiba[sikuNum].length+")";
+
+let html="";
+ratiba[sikuNum].forEach(r=>{
+html+=`<div class="card today-class" style="margin:5px 0;padding:10px"><b>${r.somo}</b><br><small>${r.muda} | ${r.chumba}</small></div>`;
+});
+document.getElementById('todayList').innerHTML=html;
+
+let att=parseInt(localStorage.getItem('sc_att_'+name)||0);
+let tot=parseInt(localStorage.getItem('sc_total_'+name)||20);
+let perc=tot>0?Math.round((att/tot)*100):90;
+document.getElementById('myPercent').innerText=perc+"%";
+
+let lastMark=localStorage.getItem('sc_last_'+name);
+let todayStr=leo.toDateString();
+if(lastMark===todayStr){document.getElementById('nipoMsg').innerText="Umeshamark NIPO leo ✅";}
+}
+
+function markNipo(){
+let name=localStorage.getItem('sc_name');
+let todayStr=new Date().toDateString();
+let lastMark=localStorage.getItem('sc_last_'+name);
+if(lastMark===todayStr){alert("Umeshamark tayari leo!");return;}
+let att=parseInt(localStorage.getItem('sc_att_'+name)||0)+1;
+let tot=parseInt(localStorage.getItem('sc_total_'+name)||0)+1;
+localStorage.setItem('sc_att_'+name,att);
+localStorage.setItem('sc_total_'+name,tot);
+localStorage.setItem('sc_last_'+name,todayStr);
+document.getElementById('nipoMsg').innerText="Hongera! Upo darasani leo ✅";
+showMain();
+}
+
+function logout(){
+if(confirm("Toka kwenye akaunti?")){
+localStorage.removeItem('sc_name');
+localStorage.removeItem('sc_pass');
+location.reload();
+}
+}
+showMain();
+</script>
 </body>
 </html>
