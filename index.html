@@ -3,112 +3,82 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SMART CLASS V12 - Editable</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+<title>SMART CLASS V13</title>
 <style>
-*{font-family:'Poppins',sans-serif} body{background:linear-gradient(135deg,#0a3d62,#1e90ff);margin:0;min-height:100vh;padding:10px}
-.glass{background:rgba(255,255,255,0.95);border-radius:20px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,0.3);margin-bottom:10px}
-.header-main{background:linear-gradient(135deg,#0a3d62,#f1c40f);color:white;padding:18px;border-radius:20px;text-align:center;margin-bottom:10px}
-.count-box{background:#0a3d62;color:#f1c40f;padding:10px;border-radius:12px;text-align:center;border:2px solid #f1c40f}
-.count-num{font-size:30px;font-weight:700;display:block}
-.btn-main{background:linear-gradient(135deg,#f1c40f,#f39c12);color:#0a3d62;border:none;padding:12px;border-radius:10px;width:100%;font-weight:700}
-.btn-sub{background:#0a3d62;color:white;border:none;padding:10px;border-radius:10px;width:100%;font-weight:600;margin-top:6px}
-input,textarea,select{width:92%;padding:11px;margin:5px 0;border-radius:10px;border:2px solid #ddd;font-size:14px}
+body{background:#0a3d62;margin:0;padding:15px;font-family:Arial}
+.card{background:white;border-radius:15px;padding:20px;margin-bottom:10px}
+.btn{background:#f1c40f;color:#0a3d62;border:none;padding:14px;width:100%;border-radius:10px;font-weight:bold;font-size:16px}
+input{width:92%;padding:12px;margin:6px 0;border-radius:8px;border:2px solid #ddd}
 .hidden{display:none}
-.today-card{border-left:6px solid #27ae60;background:#eafaf1;border-radius:10px;padding:10px;margin:6px 0}
-.lib-card{border-left:6px solid #8e44ad;background:#f5eef8;border-radius:10px;padding:10px;margin:6px 0;display:flex;justify-content:space-between;align-items:center}
-.tangazo-card{border-left:6px solid #e74c3c;background:#fdedec;border-radius:10px;padding:10px;margin:6px 0}
-.nav{display:flex;gap:6px;margin-bottom:8px;overflow-x:auto}
-.nav button{padding:8px 12px;border-radius:20px;border:none;background:white;color:#0a3d62;font-weight:700;white-space:nowrap;font-size:12px}
+.nav{display:flex;gap:5px;margin:10px 0;overflow:auto}
+.nav button{padding:8px 12px;border-radius:20px;border:none;background:white;font-weight:bold;white-space:nowrap}
 .nav button.active{background:#f1c40f}
-.teacher-card{border-left:6px solid #2980b9;background:#eaf2f8;border-radius:10px;padding:10px;margin:6px 0;display:flex;justify-content:space-between}
+.item{border-left:5px solid #27ae60;background:#eafaf1;padding:10px;border-radius:8px;margin:5px 0}
 </style>
 </head>
 <body>
-<div id="loginPage" class="glass">
-<div style="text-align:center;font-size:45px">🎓</div>
-<h2 style="text-align:center;color:#0a3d62;margin:5px">SMART CLASS V12</h2>
-<p style="text-align:center;color:#666;font-size:11px">Editable - Ratiba + Walimu + Vitabu</p>
-<input id="regName" placeholder="👤 Jina Kamili">
-<input id="regPass" type="password" placeholder="🔒 Password (weka 1234 kama CR)">
-<button class="btn-main" onclick="register()">INGIA →</button>
-<p style="text-align:center;font-size:10px;color:#888">CR akiweka 1234 atapata Admin Panel</p>
+<div id="login" class="card" style="margin-top:50px;text-align:center">
+<h2>🎓 SMART CLASS V13</h2>
+<input id="name" placeholder="Jina - mf: Godfrey">
+<input id="pass" type="password" placeholder="Password 1234 kwa Admin">
+<button class="btn" onclick="ingia()">INGIA →</button>
+<p style="font-size:11px;color:#888">CR weka 1234 kuona Admin</p>
 </div>
 
-<div id="mainPage" class="hidden">
-<div class="header-main">
-<h2 id="welcomeText" style="margin:0;font-size:18px">Habari!</h2>
-<p id="todayDate" style="margin:4px 0;font-size:11px;opacity:0.9"></p>
-<div class="count-box"><span class="count-num" id="examCountdown">Siku 87</span><span style="font-size:11px;color:white">hadi Mtihani Dec 15, 2026</span></div>
-<button onclick="enableAlarm()" id="alarmBtn" style="background:white;color:#0a3d62;border:none;padding:8px;border-radius:20px;font-weight:700;width:100%;margin-top:8px;font-size:12px">🔔 Wezesha Alarm Saa 1 Kabla</button>
-<div id="alarmStatus" class="hidden" style="background:#27ae60;color:white;padding:6px;border-radius:8px;margin-top:6px;font-size:11px">✅ Alarm ON</div>
+<div id="main" class="hidden">
+<div class="card" style="background:linear-gradient(135deg,#0a3d62,#f1c40f);color:white;text-align:center">
+<h2 id="hi" style="margin:0">Habari!</h2>
+<p id="leo" style="font-size:12px"></p>
+<h1 id="count" style="color:#f1c40f;margin:5px">Siku 87</h1>
+<button onclick="washaAlarm()" id="aBtn" style="background:white;border:none;padding:8px 15px;border-radius:20px;font-weight:bold;width:100%">🔔 Wezesha Alarm</button>
+<p id="aOn" class="hidden" style="background:#27ae60;padding:5px;border-radius:5px;font-size:12px">✅ Alarm ON - Saa 1 kabla</p>
 </div>
 
 <div class="nav">
-<button id="btnRatiba" class="active" onclick="showTab('ratiba')">📅 Ratiba</button>
-<button id="btnTangazo" onclick="showTab('tangazo')">📢 Tangazo</button>
-<button id="btnLib" onclick="showTab('lib')">📚 Library</button>
-<button id="btnWalimu" onclick="showTab('walimu')">👨‍🏫 Walimu</button>
-<button id="btnAdmin" class="hidden" onclick="showTab('admin')">⚙️ Admin</button>
+<button id="b1" class="active" onclick="tab('ratiba')">📅 Ratiba</button>
+<button id="b2" onclick="tab('tangazo')">📢 Tangazo</button>
+<button id="b3" onclick="tab('lib')">📚 Library</button>
+<button id="b4" onclick="tab('walimu')">👨‍🏫 Walimu</button>
+<button id="b5" class="hidden" onclick="tab('admin')">⚙️ Admin</button>
 </div>
 
-<div id="tabRatiba" class="glass"><h3 id="todayTitle" style="color:#0a3d62;margin-top:0;font-size:15px">Vipindi Vya Leo</h3><div id="todayList"></div><button class="btn-sub" onclick="markNipo()">✅ NIPO DARASANI</button><p id="nipoMsg" style="text-align:center;color:#27ae60;font-weight:700;font-size:13px"></p></div>
-
-<div id="tabTangazo" class="glass hidden"><h3 style="color:#c0392b;margin-top:0;font-size:15px">📢 Matangazo</h3><div id="tangazoList"></div><div id="tangazoForm"><input id="newTangazoTitle" placeholder="Kichwa cha tangazo"><textarea id="newTangazoBody" placeholder="Maelezo..."></textarea><button class="btn-sub" style="background:#c0392b" onclick="addTangazo()">+ Tuma Tangazo</button></div></div>
-
-<div id="tabLib" class="glass hidden"><h3 style="color:#8e44ad;margin-top:0;font-size:15px">📚 E-Library</h3><div id="libList"></div><div id="libForm"><input id="newLibTitle" placeholder="Jina la kitabu"><input id="newLibLink" placeholder="Link (Google Drive / Website)"><button class="btn-sub" style="background:#8e44ad" onclick="addLib()">+ Ongeza Kitabu</button></div></div>
-
-<div id="tabWalimu" class="glass hidden"><h3 style="color:#2980b9;margin-top:0;font-size:15px">👨‍🏫 Namba za Walimu</h3><div id="walimuList"></div></div>
-
-<div id="tabAdmin" class="glass hidden" style="border:3px solid #f1c40f">
-<h3 style="color:#0a3d62;margin-top:0">⚙️ ADMIN PANEL - Edit Ratiba & Walimu</h3>
-<p style="font-size:11px;color:#666">Hapa CR tu ndiye anaweza ku-edit. Mabadiliko yana-save moja kwa moja.</p>
-
-<b style="font-size:13px">1. Ongeza Kipindi Kipya:</b>
-<select id="adminDay"><option value="1">Jumatatu</option><option value="2">Jumanne</option><option value="3">Jumatano</option><option value="4">Alhamisi</option><option value="5">Ijumaa</option><option value="0">Jumapili</option><option value="6">Jumamosi</option></select>
-<input id="adminSomo" placeholder="Jina la Somo - mf: Database">
-<input id="adminMuda" placeholder="Muda - mf: 8:00-10:00">
-<input id="adminStartH" type="number" placeholder="Saa ya kuanza (namba tu) - mf: 8">
-<input id="adminChumba" placeholder="Chumba - mf: Lab 2">
-<button class="btn-sub" onclick="adminAddRatiba()">+ Ongeza Kwenye Ratiba</button>
-
-<hr style="margin:12px 0">
-<b style="font-size:13px">2. Ongeza Mwalimu:</b>
-<input id="adminMwalimuName" placeholder="Jina la Mwalimu - mf: Mr. John">
-<input id="adminMwalimuSomo" placeholder="Somo analofundisha">
-<input id="adminMwalimuPhone" placeholder="Namba ya simu - mf: 0712345678">
-<button class="btn-sub" style="background:#2980b9" onclick="adminAddMwalimu()">+ Ongeza Mwalimu</button>
-
-<hr style="margin:12px 0">
-<b style="font-size:13px">3. Futa Ratiba Zote (Reset):</b>
-<button class="btn-sub" style="background:#e74c3c" onclick="resetRatiba()">🗑️ Futa Ratiba Zote</button>
+<div id="tRatiba" class="card"><h3>📅 Vipindi Vya Leo</h3><div id="listRatiba"></div><button class="btn" style="background:#0a3d62;color:white;margin-top:10px" onclick="nipo()">✅ NIPO DARASANI</button><p id="nipoMsg" style="color:green;text-align:center;font-weight:bold"></p></div>
+<div id="tTangazo" class="card hidden"><h3>📢 Tangazo</h3><div id="listTangazo"></div><input id="tTitle" placeholder="Kichwa"><input id="tBody" placeholder="Maelezo"><button class="btn" style="background:#c0392b;color:white" onclick="addT()">+ Tuma Tangazo</button></div>
+<div id="tLib" class="card hidden"><h3>📚 Library</h3><div id="listLib"></div><input id="lTitle" placeholder="Jina la kitabu"><input id="lLink" placeholder="Link ya Drive"><button class="btn" style="background:#8e44ad;color:white" onclick="addL()">+ Ongeza Kitabu</button></div>
+<div id="tWalimu" class="card hidden"><h3>👨‍🏫 Walimu</h3><div id="listWalimu"></div></div>
+<div id="tAdmin" class="card hidden" style="border:3px solid #f1c40f"><h3>⚙️ ADMIN - Edit</h3>
+<select id="aDay" style="width:98%;padding:10px;border-radius:8px"><option value="1">Jumatatu</option><option value="2">Jumanne</option><option value="3">Jumatano</option><option value="4">Alhamisi</option><option value="5">Ijumaa</option></select>
+<input id="aSomo" placeholder="Somo - mf: Database"><input id="aMuda" placeholder="Muda - mf: 8:00-10:00"><input id="aStart" type="number" placeholder="Saa - mf: 8"><input id="aChumba" placeholder="Chumba - mf: Lab 2">
+<button class="btn" style="background:#0a3d62;color:white" onclick="addR()">+ Ongeza Kipindi</button><hr>
+<input id="aMName" placeholder="Jina la Mwalimu"><input id="aMSomo" placeholder="Somo"><input id="aMPhone" placeholder="Namba - 0712345678">
+<button class="btn" style="background:#2980b9;color:white" onclick="addM()">+ Ongeza Mwalimu</button>
 </div>
-
-<audio id="alarmSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
-<div style="text-align:center"><button onclick="logout()" style="background:rgba(255,255,255,0.3);border:none;color:white;padding:6px 12px;border-radius:20px;font-size:11px;margin-top:8px">Toka</button></div>
+<button onclick="toka()" style="background:rgba(255,255,255,0.3);color:white;border:none;padding:8px 15px;border-radius:20px;margin:auto;display:block">Toka</button>
+<audio id="snd" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
 </div>
 
 <script>
-const EXAM_DATE = new Date("2026-12-15T08:00:00");
-const defaultRatiba = {0:[],1:[{somo:"Database Lab",muda:"8:00-10:00",startH:8,chumba:"Lab 2"},{somo:"English",muda:"11:00-13:00",startH:11,chumba:"LH 1"}],2:[{somo:"Calculus",muda:"10:00-12:00",startH:10,chumba:"LH 3"}],3:[{somo:"Networking",muda:"8:00-10:00",startH:8,chumba:"Lab 1"},{somo:"Programming",muda:"14:00-16:00",startH:14,chumba:"Lab 2"}],4:[{somo:"System Analysis",muda:"9:00-11:00",startH:9,chumba:"LH 2"}],5:[],6:[]};
-const defaultWalimu = [{name:"Mr. Juma",somo:"Database",phone:"0712345678"},{name:"Madam Sarah",somo:"Networking",phone:"0765432109"},{name:"HOD",somo:"All Subjects",phone:"0711223344"}];
-let ratiba = JSON.parse(localStorage.getItem('sc_ratiba_v12')||JSON.stringify(defaultRatiba));
-let walimu = JSON.parse(localStorage.getItem('sc_walimu_v12')||JSON.stringify(defaultWalimu));
-const siku=["Jumapili","Jumatatu","Jumanne","Jumatano","Alhamisi","Ijumaa","Jumamosi"];
-function register(){let n=document.getElementById('regName').value; let p=document.getElementById('regPass').value; if(n.length<3){alert("Weka jina");return;} localStorage.setItem('sc_name',n); localStorage.setItem('sc_pass',p); showMain();}
-function showMain(){let name=localStorage.getItem('sc_name'); let pass=localStorage.getItem('sc_pass'); if(!name) return; document.getElementById('loginPage').classList.add('hidden'); document.getElementById('mainPage').classList.remove('hidden'); if(pass==="1234"){document.getElementById('btnAdmin').classList.remove('hidden');} document.getElementById('welcomeText').innerText="Habari, "+name+"!"; let leo=new Date(); document.getElementById('todayDate').innerText="Leo ni "+siku[leo.getDay()]+" - "+leo.toLocaleDateString('sw-TZ'); updateCountdown(); setInterval(updateCountdown,60000); renderToday(); renderWalimu(); checkAlarmPermission(); setInterval(checkAlarm,60000); loadData();}
-function showTab(t){['ratiba','tangazo','lib','walimu','admin'].forEach(x=>{let el=document.getElementById('tab'+x.charAt(0).toUpperCase()+x.slice(1)); if(el) el.classList.add('hidden'); let btn=document.getElementById('btn'+x.charAt(0).toUpperCase()+x.slice(1)); if(btn) btn.classList.remove('active');}); document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.remove('hidden'); document.getElementById('btn'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('active');}
-function updateCountdown(){let now=new Date(); let diff=EXAM_DATE-now; let days=Math.ceil(diff/(1000*60*60*24)); if(days<0) days=0; document.getElementById('examCountdown').innerText="Siku "+days; if(now.getHours()===18 && now.getMinutes()===0){renderToday();}}
-function renderToday(){let leo=new Date(); let num=leo.getDay(); let list=ratiba[num]||[]; document.getElementById('todayTitle').innerText="📅 Vipindi - "+siku[num]+" ("+list.length+")"; let html=""; if(list.length===0){html="<div style='text-align:center;padding:15px;color:#888'>😴 Hakuna vipindi leo</div>"} else{list.forEach((r,i)=>{html+=`<div class="today-card"><b>📚 ${r.somo}</b><br><small>⏰ ${r.muda} | 📍 ${r.chumba}</small> ${localStorage.getItem('sc_pass')==="1234"?`<button onclick="deleteRatiba(${num},${i})" style="float:right;background:#e74c3c;color:white;border:none;padding:3px 8px;border-radius:5px;font-size:10px">Futa</button>`:''}</div>`});} document.getElementById('todayList').innerHTML=html;}
-function renderWalimu(){let html=""; walimu.forEach((w,i)=>{html+=`<div class="teacher-card"><div><b>👨‍🏫 ${w.name}</b><br><small>📘 ${w.somo}<br>📞 ${w.phone}</small></div><div><a href="tel:${w.phone}" style="background:#27ae60;color:white;padding:8px 12px;border-radius:8px;text-decoration:none;font-size:12px">Piga</a> ${localStorage.getItem('sc_pass')==="1234"?`<button onclick="deleteMwalimu(${i})" style="background:#e74c3c;color:white;border:none;padding:5px 8px;border-radius:5px;margin-left:5px;font-size:10px">Futa</button>`:''}</div></div>`}); document.getElementById('walimuList').innerHTML=html;}
-function adminAddRatiba(){let d=parseInt(document.getElementById('adminDay').value); let s=document.getElementById('adminSomo').value; let m=document.getElementById('adminMuda').value; let sh=parseInt(document.getElementById('adminStartH').value); let ch=document.getElementById('adminChumba').value; if(!s||!m||isNaN(sh)||!ch){alert("Jaza vyote!");return;} if(!ratiba[d]) ratiba[d]=[]; ratiba[d].push({somo:s,muda:m,startH:sh,chumba:ch}); localStorage.setItem('sc_ratiba_v12',JSON.stringify(ratiba)); renderToday(); alert("Kipindi kimeongezwa kwa "+siku[d]+"!"); document.getElementById('adminSomo').value=''; document.getElementById('adminMuda').value='';}
-function adminAddMwalimu(){let n=document.getElementById('adminMwalimuName').value; let s=document.getElementById('adminMwalimuSomo').value; let p=document.getElementById('adminMwalimuPhone').value; if(!n||!s||!p){alert("Jaza vyote!");return;} walimu.push({name:n,somo:s,phone:p}); localStorage.setItem('sc_walimu_v12',JSON.stringify(walimu)); renderWalimu(); alert("Mwalimu ameongezwa!"); document.getElementById('adminMwalimuName').value='';}
-function deleteRatiba(day,index){if(confirm("Futa kipindi hiki?")){ratiba[day].splice(index,1); localStorage.setItem('sc_ratiba_v12',JSON.stringify(ratiba)); renderToday();}}
-function deleteMwalimu(i){if(confirm("Futa mwalimu huyu?")){walimu.splice(i,1); localStorage.setItem('sc_walimu_v12',JSON.stringify(walimu)); renderWalimu();}}
-function resetRatiba(){if(confirm("Una uhakika unataka kufuta ratiba ZOTE?")){localStorage.removeItem('sc_ratiba_v12'); ratiba=JSON.parse(JSON.stringify(defaultRatiba)); renderToday(); alert("Imereseti!");}}
-function enableAlarm(){Notification.requestPermission().then(p=>{if(p==="granted"){localStorage.setItem('sc_alarm','on'); document.getElementById('alarmStatus').classList.remove('hidden'); document.getElementById('alarmBtn').innerText="✅ Alarm ON";}});}
-function checkAlarmPermission(){if(localStorage.getItem('sc_alarm')==='on' && Notification.permission==='granted'){document.getElementById('alarmStatus').classList.remove('hidden'); document.getElementById('alarmBtn').innerText="✅ Alarm ON";}}
-function checkAlarm(){if(localStorage.getItem('sc_alarm')!=='on' || Notification.permission!=='granted') return; let now=new Date(); let num=now.getDay(); let currentH=now.getHours(); let currentM=now.getMinutes(); (ratiba[num]||[]).forEach(r=>{if(r.startH-1===currentH && currentM===0){let key='notified_'+now.toDateString()+'_'+r.somo; if(localStorage.getItem(key)) return; localStorage.setItem(key,'1'); document.getElementById('alarmSound').play(); new Notification("🔔 Jiandae!",{body:`${r.somo} inaanza ${r.muda} ${r.chumba}`});}});}
-function markNipo(){let name=localStorage.getItem('sc_name'); let todayStr=new Date().toDateString(); localStorage.setItem('sc_last_'+name,todayStr); document.getElementById('nipoMsg').innerText="✅ Upo darasani leo!";}
-function addTangazo(){let t=document.getElementById('newTangazoTitle').value; let b=document.getElementById('newTangazoBody').value; if(!t||!b){alert("Jaza vyote");return;} let html=`<div class="tangazo-card"><b>📢 ${t}</b><br><small>${b}</small><br><small style="color:#888">- ${localStorage.getItem('sc_name')}</small></div>`; document.getElementById('tangazoList').innerHTML=html+document.getElementById('tangazoList').innerHTML; let arr=JSON.parse(localStorage.getItem('sc_tangazo')||'[]'); arr.unshift({t,b,name:localStorage.getItem('sc_name')}); localStorage.setItem('sc_tangazo',JSON.stringify(arr)); document.getElementById('newTangazoTitle').value=''; document.getElementById('newTangazoBody').value='';}
-function addLib(){let t=document.getElementById('newLibTitle').value; let l=document.getElementById('newLibLink').value; if(!t||!l){alert("Jaza vyote");return;} let html=`<div class="lib-card"><div><b>📘 ${t}</b
+let EXAM = new Date("2026-12-15T08:00:00");
+let RATIBA = JSON.parse(localStorage.getItem('R')||'{"1":[{"somo":"Database Lab","muda":"8:00-10:00","startH":8,"chumba":"Lab 2"}],"2":[{"somo":"Calculus","muda":"10:00-12:00","startH":10,"chumba":"LH 3"}],"3":[{"somo":"Networking","muda":"8:00-10:00","startH":8,"chumba":"Lab 1"}],"4":[{"somo":"System Analysis","muda":"9:00-11:00","startH":9,"chumba":"LH 2"}],"5":[],"0":[],"6":[]}');
+let WALIMU = JSON.parse(localStorage.getItem('W')||'[{"name":"Mr. Juma","somo":"Database","phone":"0712345678"},{"name":"HOD","somo":"All","phone":"0711223344"}]');
+let SIKU=["Jumapili","Jumatatu","Jumanne","Jumatano","Alhamisi","Ijumaa","Jumamosi"];
+function ingia(){let n=document.getElementById('name').value; let p=document.getElementById('pass').value; if(n.length<2){alert("Weka jina");return;} localStorage.setItem('N',n); localStorage.setItem('P',p); openMain();}
+function openMain(){let n=localStorage.getItem('N'); if(!n){return;} document.getElementById('login').classList.add('hidden'); document.getElementById('main').classList.remove('hidden'); document.getElementById('hi').innerText="Habari, "+n+"!"; if(localStorage.getItem('P')=="1234"){document.getElementById('b5').classList.remove('hidden');} let d=new Date(); document.getElementById('leo').innerText="Leo ni "+SIKU[d.getDay()]+" - "+d.toLocaleDateString('sw-TZ'); updCount(); renderR(); renderW(); loadAll(); setInterval(updCount,60000); setInterval(checkA,60000);}
+function updCount(){let diff=EXAM-new Date(); let days=Math.ceil(diff/86400000); if(days<0)days=0; document.getElementById('count').innerText="Siku "+days+" hadi Mtihani";}
+function tab(t){["Ratiba","Tangazo","Lib","Walimu","Admin"].forEach(x=>{document.getElementById("t"+x).classList.add('hidden'); let b=document.getElementById("b"+["Ratiba","Tangazo","Lib","Walimu","Admin"].indexOf(x)+1); if(b) b.classList.remove('active');}); document.getElementById("t"+t.charAt(0).toUpperCase()+t.slice(1)).classList.remove('hidden');}
+function renderR(){let day=new Date().getDay(); let list=RATIBA[day]||[]; let h=""; if(list.length==0)h="<p style='text-align:center;color:#888'>😴 Hakuna vipindi leo</p>"; else list.forEach((r,i)=>{h+=`<div class="item"><b>${r.somo}</b><br><small>${r.muda} | ${r.chumba}</small> ${localStorage.getItem('P')=="1234"?`<button onclick="delR(${day},${i})" style="float:right;background:red;color:white;border:none;padding:3px 8px;border-radius:5px;font-size:10px">Futa</button>`:''}</div>`}); document.getElementById('listRatiba').innerHTML=h;}
+function renderW(){let h=""; WALIMU.forEach((w,i)=>{h+=`<div class="item" style="border-left-color:#2980b9;background:#eaf2f8"><b>${w.name}</b> - ${w.somo}<br><small>📞 ${w.phone}</small> <a href="tel:${w.phone}" style="background:#27ae60;color:white;padding:5px 10px;border-radius:5px;text-decoration:none;float:right">Piga</a></div>`}); document.getElementById('listWalimu').innerHTML=h;}
+function addR(){let d=document.getElementById('aDay').value; let s=document.getElementById('aSomo').value; let m=document.getElementById('aMuda').value; let sh=parseInt(document.getElementById('aStart').value); let c=document.getElementById('aChumba').value; if(!s||!m||!c||isNaN(sh)){alert("Jaza vyote");return;} if(!RATIBA[d])RATIBA[d]=[]; RATIBA[d].push({somo:s,muda:m,startH:sh,chumba:c}); localStorage.setItem('R',JSON.stringify(RATIBA)); renderR(); alert("Imeongezwa!");}
+function addM(){let n=document.getElementById('aMName').value; let s=document.getElementById('aMSomo').value; let p=document.getElementById('aMPhone').value; if(!n||!s||!p){alert("Jaza");return;} WALIMU.push({name:n,somo:s,phone:p}); localStorage.setItem('W',JSON.stringify(WALIMU)); renderW(); alert("Mwalimu ameongezwa");}
+function delR(d,i){if(confirm("Futa?")){RATIBA[d].splice(i,1); localStorage.setItem('R',JSON.stringify(RATIBA)); renderR();}}
+function addT(){let t=document.getElementById('tTitle').value; let b=document.getElementById('tBody').value; if(!t||!b){alert("Jaza");return;} let arr=JSON.parse(localStorage.getItem('TT')||'[]'); arr.unshift({t,b,n:localStorage.getItem('N')}); localStorage.setItem('TT',JSON.stringify(arr)); loadAll(); document.getElementById('tTitle').value=''; document.getElementById('tBody').value='';}
+function addL(){let t=document.getElementById('lTitle').value; let l=document.getElementById('lLink').value; if(!t||!l){alert("Jaza");return;} let arr=JSON.parse(localStorage.getItem('LL')||'[]'); arr.unshift({t,l}); localStorage.setItem('LL',JSON.stringify(arr)); loadAll(); document.getElementById('lTitle').value=''; document.getElementById('lLink').value='';}
+function loadAll(){let tt=JSON.parse(localStorage.getItem('TT')||'[]'); let ht=""; tt.forEach(o=>{ht+=`<div class="item" style="border-left-color:#e74c3c;background:#fdedec"><b>${o.t}</b><br><small>${o.b} - ${o.n}</small></div>`}); if(ht)document.getElementById('listTangazo').innerHTML=ht; let ll=JSON.parse(localStorage.getItem('LL')||'[]'); let hl=""; ll.forEach(o=>{hl+=`<div class="item" style="border-left-color:#8e44ad;background:#f5eef8"><b>${o.t}</b> <button onclick="window.open('${o.l}')" style="float:right;background:#8e44ad;color:white;border:none;padding:5px 10px;border-radius:5px">Soma</button></div>`}); if(hl)document.getElementById('listLib').innerHTML=hl;}
+function washaAlarm(){Notification.requestPermission().then(p=>{if(p=="granted"){localStorage.setItem('AL','on'); document.getElementById('aOn').classList.remove('hidden'); alert("Alarm ON - Saa 1 kabla");}});}
+function checkA(){if(localStorage.getItem('AL')!='on')return; let now=new Date(); let d=now.getDay(); let h=now.getHours(); let m=now.getMinutes(); (RATIBA[d]||[]).forEach(r=>{if(r.startH-1==h && m==0){let k='N'+now.toDateString()+r.somo; if(localStorage.getItem(k))return; localStorage.setItem(k,'1'); document.getElementById('snd').play(); new Notification("Jiandae! "+r.somo,{body:r.muda+" "+r.chumba});}});}
+function nipo(){localStorage.setItem('NIPO'+new Date().toDateString(),'1'); document.getElementById('nipoMsg').innerText="✅ Upo darasani leo!";}
+function toka(){localStorage.removeItem('N'); location.reload();}
+openMain();
+</script>
+</body>
+</html>
