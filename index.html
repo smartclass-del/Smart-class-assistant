@@ -3,74 +3,60 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SMART CLASS V15 - Godfrey Admin Only</title>
+<title>SMART CLASS V16</title>
 <style>
 body{background:#0a3d62;margin:0;padding:12px;font-family:Arial}
 .card{background:white;border-radius:15px;padding:18px;margin-bottom:10px}
 .btn{background:#f1c40f;color:#0a3d62;border:none;padding:13px;width:100%;border-radius:10px;font-weight:bold}
-input,textarea,select{width:93%;padding:11px;margin:5px 0;border-radius:8px;border:2px solid #ddd}
+input{width:93%;padding:11px;margin:5px 0;border-radius:8px;border:2px solid #ddd}
 .hidden{display:none}
 .nav{display:flex;gap:5px;margin:8px 0;overflow:auto}
 .nav button{padding:8px 12px;border-radius:20px;border:none;background:white;font-weight:bold;white-space:nowrap}
 .nav button.active{background:#f1c40f}
 .item{border-left:5px solid #27ae60;background:#eafaf1;padding:10px;border-radius:8px;margin:5px 0}
-.editBox{background:#fff3cd;border:2px dashed #f1c40f;padding:12px;border-radius:10px;margin:8px 0}
 </style>
 </head>
 <body>
-
 <script>
-// ================= EDIT HAPA TU - GODFREY =================
-// 1. RATIBA YA DARASA - Badilisha hapa tu, kila mwanafunzi ataona!
+// ===== EDIT HAPA TU =====
 const RATIBA_YANGU = {
   1: [ {somo:"Database Lab", muda:"8:00-10:00", startH:8, chumba:"Lab 2"}, {somo:"English", muda:"11:00-13:00", startH:11, chumba:"LH 1"} ],
   2: [ {somo:"Calculus", muda:"10:00-12:00", startH:10, chumba:"LH 3"} ],
-  3: [ {somo:"Networking", muda:"8:00-10:00", startH:8, chumba:"Lab 1"}, {somo:"Programming", muda:"14:00-16:00", startH:14, chumba:"Lab 2"} ],
+  3: [ {somo:"Networking", muda:"8:00-10:00", startH:8, chumba:"Lab 1"} ],
   4: [ {somo:"System Analysis", muda:"9:00-11:00", startH:9, chumba:"LH 2"} ],
   5: [ {somo:"Project", muda:"8:00-12:00", startH:8, chumba:"Lab 1"} ],
   0: [], 6: []
 };
-// 2. NAMBA ZA WALIMU - Badilisha hapa!
 const WALIMU_WANGU = [
   {name:"Mr. Juma - Database", somo:"Database", phone:"0712345678"},
-  {name:"Madam Sarah - Networking", somo:"Networking", phone:"0765432109"},
   {name:"HOD - BIT", somo:"Mkuu wa Idara", phone:"0711223344"}
 ];
-// 3. VITABU / E-LIBRARY - Weka link za Google Drive hapa!
 const VITABU_VYANGU = [
-  {title:"📘 Database Notes PDF", link:"https://www.w3schools.com/sql/"},
-  {title:" Networking notes, link:https://www.slideshare.net/slideshow/networking-notes-for-dit-part-1/175983727
-  {title:"📕 Past Papers NACTVET 2020-2024", link:"https://drive.google.com"}
+  {title:"📘 Database Notes", link:"https://www.w3schools.com/sql/"},
+  {title:"📗 Networking Slides", link:"https://www.geeksforgeeks.org/computer-network-tutorials/"}
 ];
-// 4. MATANGAZO YA DARASA - Andika hapa!
 const TANGAZO_LANGU = [
-  {title:"🔥 Mtihani wa Communication", body:"Jumatatu 22/09/2026 - Lab 2 - Kila mtu aje na laptop - CR Godfrey"},
-  {title:"📝 Assignment Networking", body:"Mwisho Ijumaa hii - Tuma kwa HOD"}
+  {title:"🚨 MUHIMU - LEO SAA 4 USIKU!", body:"Wanafunzi wote mnabidi muwe online leo saa 4 usiku (10:00 PM) kwenye Smart Class. Kikao muhimu na HOD. Msiikose! - CR Godfrey"},
+  {title:"🔥 Mtihani wa Communication", body:"Jumatatu 22/09/2026 - Lab 1"},
+  {title:"📝 Assignment Networking", body:"Mwisho Ijumaa hii"}
 ];
-// 5. TAREHE YA MTIHANI
 const TAREHE_MTIHANI = "2026-12-15T08:00:00";
-// ==========================================================
 </script>
 
 <div id="login" class="card" style="margin-top:40px;text-align:center">
 <h2>🎓 SMART CLASS</h2>
-<p style="font-size:12px;color:#666">Darasa la BIT - Godfrey CR</p>
-<input id="name" placeholder="Jina lako - mf: Neema">
-<input id="pass" type="password" placeholder="Password - weka 0000">
+<input id="name" placeholder="Jina lako">
+<input id="pass" type="password" placeholder="Password - 0000">
 <button class="btn" onclick="ingia()">INGIA →</button>
-<p style="font-size:10px;color:#888;margin-top:8px">Wanafunzi weka 0000 | CR weka 1234</p>
+<p style="font-size:10px;color:#888">Wanafunzi 0000 | CR 1234</p>
 </div>
 
 <div id="main" class="hidden">
 <div class="card" style="background:linear-gradient(135deg,#0a3d62,#f1c40f);color:white;text-align:center">
-<h2 id="hi" style="margin:0;font-size:18px"></h2>
-<p id="leo" style="font-size:11px;margin:4px"></p>
-<h1 id="count" style="color:#f1c40f;margin:5px 0">Siku 87</h1>
-<p style="font-size:11px;margin:0">hadi Mtihani Dec 15</p>
-<button onclick="washaAlarm()" id="aBtn" style="background:white;border:none;padding:7px 15px;border-radius:20px;font-weight:bold;width:100%;margin-top:8px;font-size:12px">🔔 Wezesha Alarm Saa 1 Kabla</button>
-<p id="aOn" class="hidden" style="background:#27ae60;padding:5px;border-radius:5px;font-size:11px;margin-top:5px">✅ Alarm ON</p>
+<h2 id="hi" style="margin:0"></h2>
+<p id="leo" style="font-size:11px"></p>
+<h1 id="count" style="color:#f1c40f;margin:5px 0"></h1>
 </div>
-
 <div class="nav">
 <button id="b1" class="active" onclick="tab('ratiba')">📅 Ratiba</button>
 <button id="b2" onclick="tab('tangazo')">📢 Tangazo</button>
@@ -78,53 +64,22 @@ const TAREHE_MTIHANI = "2026-12-15T08:00:00";
 <button id="b4" onclick="tab('walimu')">👨‍🏫 Walimu</button>
 <button id="b5" class="hidden" onclick="tab('admin')">⚙️ EDIT</button>
 </div>
-
-<div id="tRatiba" class="card"><h3>📅 Vipindi Vya Leo</h3><div id="listRatiba"></div><button class="btn" style="background:#0a3d62;color:white;margin-top:8px" onclick="nipo()">✅ NIPO DARASANI</button><p id="nipoMsg" style="color:green;text-align:center;font-weight:bold;font-size:13px"></p></div>
+<div id="tRatiba" class="card"><h3>📅 Vipindi Vya Leo</h3><div id="listRatiba"></div></div>
 <div id="tTangazo" class="card hidden"><h3>📢 Matangazo</h3><div id="listTangazo"></div></div>
-<div id="tLib" class="card hidden"><h3>📚 E-Library</h3><div id="listLib"></div></div>
+<div id="tLib" class="card hidden"><h3>📚 Library</h3><div id="listLib"></div></div>
 <div id="tWalimu" class="card hidden"><h3>👨‍🏫 Walimu</h3><div id="listWalimu"></div></div>
-<div id="tAdmin" class="card hidden" style="border:3px solid #f1c40f">
-<h3>⚙️ EDIT MOJA KWA MOJA - Godfrey Tu!</h3>
-<div class="editBox">
-<b>📅 Ratiba - Chagua siku uone:</b>
-<select id="aDay" onchange="showDayEdit()" style="width:98%;padding:8px;border-radius:8px"><option value="1">Jumatatu</option><option value="2">Jumanne</option><option value="3">Jumatano</option><option value="4">Alhamisi</option><option value="5">Ijumaa</option><option value="0">Jumapili</option><option value="6">Jumamosi</option></select>
-<div id="dayEditList" style="margin-top:8px"></div>
-<hr>
-<input id="aSomo" placeholder="Somo jipya - mf: Maths"><input id="aMuda" placeholder="Muda - 8:00-10:00"><input id="aStart" type="number" placeholder="Saa - 8"><input id="aChumba" placeholder="Chumba - Lab 2">
-<button class="btn" style="background:#0a3d62;color:white" onclick="addR()">+ Ongeza Kipindi Hapa (Kwa Simu Yako Tu)</button>
-<p style="font-size:10px;color:#c0392b">Kumbuka: Ili wanafunzi wote waone, edit juu kwenye RATIBA_YANGU kisha Commit GitHub!</p>
-</div>
-<div class="editBox">
-<b>👨‍🏫 Walimu:</b><div id="adminWalimu"></div>
-<input id="aMName" placeholder="Jina la Mwalimu"><input id="aMSomo" placeholder="Somo"><input id="aMPhone" placeholder="0712345678">
-<button class="btn" style="background:#2980b9;color:white" onclick="addM()">+ Ongeza Mwalimu</button>
-</div>
-</div>
+<div id="tAdmin" class="card hidden" style="border:3px solid #f1c40f"><h3>⚙️ EDIT - Godfrey Tu!</h3><p style="font-size:12px">Edit juu kwenye EDIT HAPA TU kisha Commit!</p></div>
 <button onclick="toka()" style="background:rgba(255,255,255,0.3);color:white;border:none;padding:6px 12px;border-radius:20px;margin:auto;display:block;font-size:11px">Toka</button>
-<audio id="snd" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
 </div>
 
 <script>
-let RATIBA = JSON.parse(localStorage.getItem('R15')||JSON.stringify(RATIBA_YANGU));
-let WALIMU = JSON.parse(localStorage.getItem('W15')||JSON.stringify(WALIMU_WANGU));
-let VITABU = VITABU_VYANGU; let TANGAZO = TANGAZO_LANGU;
-let EXAM = new Date(TAREHE_MTIHANI);
+let RATIBA = RATIBA_YANGU; let WALIMU = WALIMU_WANGU;
 let SIKU=["Jumapili","Jumatatu","Jumanne","Jumatano","Alhamisi","Ijumaa","Jumamosi"];
+let EXAM = new Date(TAREHE_MTIHANI);
 function ingia(){let n=document.getElementById('name').value.trim(); let p=document.getElementById('pass').value.trim(); if(n.length<2){alert("Weka jina");return;} localStorage.setItem('N',n); localStorage.setItem('P',p); openMain();}
-function openMain(){let n=localStorage.getItem('N'); let p=localStorage.getItem('P'); if(!n) return; document.getElementById('login').classList.add('hidden'); document.getElementById('main').classList.remove('hidden'); document.getElementById('hi').innerText="Habari, "+n+"!"; if(n.toLowerCase().includes("godfrey") && p=="1234"){document.getElementById('b5').classList.remove('hidden');} let d=new Date(); document.getElementById('leo').innerText="Leo ni "+SIKU[d.getDay()]+" - "+d.toLocaleDateString('sw-TZ'); updCount(); renderR(); renderW(); renderL(); renderT(); showDayEdit(); setInterval(updCount,60000);}
-function updCount(){let diff=EXAM-new Date(); let days=Math.ceil(diff/86400000); if(days<0)days=0; document.getElementById('count').innerText="Siku "+days;}
+function openMain(){let n=localStorage.getItem('N'); let p=localStorage.getItem('P'); if(!n) return; document.getElementById('login').classList.add('hidden'); document.getElementById('main').classList.remove('hidden'); document.getElementById('hi').innerText="Habari, "+n+"!"; if(n.toLowerCase().includes("godfrey") && p=="1234"){document.getElementById('b5').classList.remove('hidden');} document.getElementById('leo').innerText="Leo ni "+SIKU[new Date().getDay()]; let diff=EXAM-new Date(); let days=Math.ceil(diff/86400000); if(days<0)days=0; document.getElementById('count').innerText="Siku "+days+" hadi Mtihani"; renderAll();}
+function renderAll(){let day=new Date().getDay(); let list=RATIBA[day]||[]; let h=""; if(list.length==0)h="<p style='text-align:center;color:#888'>😴 Hakuna vipindi leo</p>"; else list.forEach(r=>{h+=`<div class="item"><b>${r.somo}</b><br><small>⏰ ${r.muda} | 📍 ${r.chumba}</small></div>`}); document.getElementById('listRatiba').innerHTML=h; let ht=""; TANGAZO_LANGU.forEach(t=>{let col=t.title.includes("MUHIMU")?"#c0392b":"#e74c3c"; let bg=t.title.includes("MUHIMU")?"#f9ebea":"#fdedec"; ht+=`<div class="item" style="border-left-color:${col};background:${bg}"><b>${t.title}</b><br><small>${t.body}</small></div>`}); document.getElementById('listTangazo').innerHTML=ht; let hl=""; VITABU_VYANGU.forEach(v=>{hl+=`<div class="item" style="border-left-color:#8e44ad;background:#f5eef8"><b>${v.title}</b> <button onclick="window.open('${v.link}')" style="float:right;background:#8e44ad;color:white;border:none;padding:5px 10px;border-radius:5px">Soma</button></div>`}); document.getElementById('listLib').innerHTML=hl; let hw=""; WALIMU_WANGU.forEach(w=>{hw+=`<div class="item" style="border-left-color:#2980b9;background:#eaf2f8"><b>${w.name}</b> - ${w.somo}<br><small>📞 ${w.phone}</small> <a href="tel:${w.phone}" style="background:#27ae60;color:white;padding:5px 10px;border-radius:5px;text-decoration:none;float:right">Piga</a></div>`}); document.getElementById('listWalimu').innerHTML=hw;}
 function tab(t){["Ratiba","Tangazo","Lib","Walimu","Admin"].forEach(x=>{document.getElementById("t"+x).classList.add('hidden');}); document.getElementById("t"+t.charAt(0).toUpperCase()+t.slice(1)).classList.remove('hidden');}
-function renderR(){let day=new Date().getDay(); let list=RATIBA[day]||[]; let h=""; if(list.length==0)h="<p style='text-align:center;color:#888'>😴 Hakuna vipindi leo</p>"; else list.forEach(r=>{h+=`<div class="item"><b>${r.somo}</b><br><small>⏰ ${r.muda} | 📍 ${r.chumba}</small></div>`}); document.getElementById('listRatiba').innerHTML=h;}
-function renderW(){let h=""; WALIMU.forEach(w=>{h+=`<div class="item" style="border-left-color:#2980b9;background:#eaf2f8"><b>${w.name}</b> - ${w.somo}<br><small>📞 ${w.phone}</small> <a href="tel:${w.phone}" style="background:#27ae60;color:white;padding:5px 10px;border-radius:5px;text-decoration:none;float:right">Piga</a></div>`}); document.getElementById('listWalimu').innerHTML=h; let ha=""; WALIMU.forEach((w,i)=>{ha+=`<div style="font-size:12px;padding:4px;border-bottom:1px solid #eee">${w.name} - ${w.phone} <button onclick="delM(${i})" style="float:right;background:red;color:white;border:none;padding:2px 6px;border-radius:4px;font-size:10px">Futa</button></div>`}); document.getElementById('adminWalimu').innerHTML=ha;}
-function renderL(){let h=""; VITABU.forEach(v=>{h+=`<div class="item" style="border-left-color:#8e44ad;background:#f5eef8"><b>${v.title}</b> <button onclick="window.open('${v.link}')" style="float:right;background:#8e44ad;color:white;border:none;padding:5px 10px;border-radius:5px">Soma</button></div>`}); document.getElementById('listLib').innerHTML=h;}
-function renderT(){let h=""; TANGAZO.forEach(t=>{h+=`<div class="item" style="border-left-color:#e74c3c;background:#fdedec"><b>${t.title}</b><br><small>${t.body}</small></div>`}); document.getElementById('listTangazo').innerHTML=h;}
-function showDayEdit(){let d=document.getElementById('aDay').value; let list=RATIBA[d]||[]; let h=""; if(list.length==0)h="<small>Hakuna vipindi siku hii</small>"; else list.forEach((r,i)=>{h+=`<div style="font-size:12px;padding:4px;border-bottom:1px solid #eee">${r.somo} ${r.muda} <button onclick="delR(${d},${i})" style="float:right;background:red;color:white;border:none;padding:2px 6px;border-radius:4px;font-size:10px">Futa</button></div>`}); document.getElementById('dayEditList').innerHTML=h;}
-function addR(){let d=document.getElementById('aDay').value; let s=document.getElementById('aSomo').value; let m=document.getElementById('aMuda').value; let sh=parseInt(document.getElementById('aStart').value); let c=document.getElementById('aChumba').value; if(!s||!m||!c||isNaN(sh)){alert("Jaza vyote");return;} if(!RATIBA[d])RATIBA[d]=[]; RATIBA[d].push({somo:s,muda:m,startH:sh,chumba:c}); localStorage.setItem('R15',JSON.stringify(RATIBA)); renderR(); showDayEdit(); alert("Imeongezwa kwenye simu yako! Ili wanafunzi wote waone, copy hii uende ukaweke juu kwenye RATIBA_YANGU GitHub!");}
-function addM(){let n=document.getElementById('aMName').value; let s=document.getElementById('aMSomo').value; let p=document.getElementById('aMPhone').value; if(!n||!s||!p){alert("Jaza");return;} WALIMU.push({name:n,somo:s,phone:p}); localStorage.setItem('W15',JSON.stringify(WALIMU)); renderW();}
-function delR(d,i){if(confirm("Futa?")){RATIBA[d].splice(i,1); localStorage.setItem('R15',JSON.stringify(RATIBA)); renderR(); showDayEdit();}}
-function delM(i){if(confirm("Futa mwalimu?")){WALIMU.splice(i,1); localStorage.setItem('W15',JSON.stringify(WALIMU)); renderW();}}
-function washaAlarm(){Notification.requestPermission().then(p=>{if(p=="granted"){localStorage.setItem('AL','on'); document.getElementById('aOn').classList.remove('hidden');}});}
-function nipo(){document.getElementById('nipoMsg').innerText="✅ Upo darasani leo!";}
 function toka(){localStorage.removeItem('N'); location.reload();}
 openMain();
 </script>
