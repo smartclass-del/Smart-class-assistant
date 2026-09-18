@@ -3,64 +3,69 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SMART CLASS V3 - Fixed</title>
+<title>SMART CLASS - Beautiful</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
 <style>
-body{font-family:Arial;background:#f0f2f5;margin:0;padding:10px}
-.header{background:#0a3d62;color:white;padding:15px;border-radius:12px;text-align:center}
-.card{background:white;padding:15px;border-radius:12px;margin:10px 0;box-shadow:0 2px 5px rgba(0,0,0,0.1)}
-.btn{background:#0a3d62;color:white;padding:12px;border:none;border-radius:8px;width:100%;margin-top:10px;font-weight:bold}
-input{width:95%;padding:10px;margin:5px 0;border-radius:8px;border:1px solid #ccc}
+*{font-family:'Poppins',sans-serif}
+body{background:linear-gradient(135deg,#0a3d62,#1e90ff);margin:0;min-height:100vh;padding:15px}
+.glass{background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:20px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,0.3)}
+.header-main{background:linear-gradient(135deg,#0a3d62,#f1c40f);color:white;padding:20px;border-radius:20px;text-align:center;margin-bottom:15px}
+.count-box{background:#0a3d62;color:#f1c40f;padding:15px;border-radius:15px;text-align:center;border:3px solid #f1c40f}
+.count-num{font-size:36px;font-weight:700;display:block}
+.btn-main{background:linear-gradient(135deg,#f1c40f,#f39c12);color:#0a3d62;border:none;padding:15px;border-radius:12px;width:100%;font-weight:700;font-size:16px;box-shadow:0 4px 10px rgba(0,0,0,0.2)}
+.btn-sub{background:#0a3d62;color:white;border:none;padding:12px;border-radius:12px;width:100%;font-weight:600;margin-top:10px}
+input{width:92%;padding:14px;margin:8px 0;border-radius:12px;border:2px solid #ddd;font-size:15px}
 .hidden{display:none}
-.today-class{border-left:5px solid #27ae60;background:#eafaf1}
-.countdown{font-size:28px;font-weight:bold;color:#ff0000;text-align:center;background:yellow;padding:5px;border-radius:8px;margin:10px 0}
+.today-card{border-left:6px solid #27ae60;background:#eafaf1;border-radius:12px;padding:12px;margin:8px 0}
+.alarm-box{background:linear-gradient(135deg,#fff9c4,#ffeb3b);border:2px dashed #f1c40f;padding:15px;border-radius:15px;text-align:center}
 </style>
 </head>
 <body>
-<div id="loginPage" class="card">
-<h2 style="text-align:center">SMART CLASS V3.1</h2>
-<p style="text-align:center;font-size:13px">Ingia uone ratiba ya leo</p>
-<input id="regName" placeholder="Jina Kamili">
-<input id="regPass" type="password" placeholder="Password">
-<button class="btn" onclick="register()">JISAJILI / INGIA</button>
+<div id="loginPage" class="glass">
+<div style="text-align:center;font-size:50px">🎓</div>
+<h2 style="text-align:center;color:#0a3d62;margin:5px">SMART CLASS</h2>
+<p style="text-align:center;color:#666;font-size:13px;margin-top:0">Assistant ya Kidato - Ingia</p>
+<input id="regName" placeholder="👤 Jina Kamili - mf: Godfrey Fadhili">
+<input id="regPass" type="password" placeholder="🔒 Password">
+<button class="btn-main" onclick="register()">INGIA DARASANI →</button>
+<p style="text-align:center;font-size:11px;color:#888;margin-top:15px">Kila mwanafunzi ana account yake binafsi</p>
 </div>
+
 <div id="mainPage" class="hidden">
-<div class="header">
-<h2 id="welcomeText">Habari!</h2>
-<p id="todayDate"></p>
-<div class="countdown" id="examCountdown">Inapakia...</div>
-<p style="font-size:11px">Mtihani wa Mwisho: Dec 15, 2026 - 8:00 AM</p>
-<button onclick="enableAlarm()" id="alarmBtn" style="background:#ffc107;color:black;border:none;padding:10px 15px;border-radius:20px;font-weight:bold;margin-top:10px;width:100%">🔔 BONYEZA HAPA KUWESHA ALARM</button>
-<div id="alarmStatus" class="hidden" style="background:#d4edda;color:#155724;padding:10px;border-radius:8px;margin-top:10px">🔔 Alarm Iko ON: Utapata kelele saa 1 kabla ya kipindi</div>
-<button onclick="logout()" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:5px 10px;border-radius:5px;font-size:11px;margin-top:10px">Toka</button>
+<div class="header-main">
+<h2 id="welcomeText" style="margin:0">Habari!</h2>
+<p id="todayDate" style="margin:5px 0;opacity:0.9;font-size:13px"></p>
+<div class="count-box">
+<span class="count-num" id="examCountdown">Siku 87</span>
+<span style="font-size:13px;color:white">hadi Mtihani wa Mwisho</span><br>
+<span style="font-size:10px;color:#ddd">Dec 15, 2026 - 08:00 AM - Hall A</span>
 </div>
-<div class="card" id="todayCard">
-<h3 id="todayTitle">Vipindi Vya Leo</h3>
+<button onclick="enableAlarm()" id="alarmBtn" class="btn-main" style="margin-top:15px;background:white;color:#0a3d62">🔔 Wezesha Alarm (Saa 1 Kabla)</button>
+<div id="alarmStatus" class="hidden" style="background:#27ae60;color:white;padding:10px;border-radius:10px;margin-top:10px;font-size:12px">✅ Alarm Iko ON - Utalia saa 1 kabla ya kipindi!</div>
+</div>
+
+<div class="glass">
+<h3 id="todayTitle" style="color:#0a3d62;margin-top:0">📅 Vipindi Vya Leo</h3>
 <div id="todayList"></div>
-<button class="btn" onclick="markNipo()">NIPO DARASANI LEO ✅</button>
-<p id="nipoMsg" style="text-align:center;color:green;font-weight:bold"></p>
+<button class="btn-sub" onclick="markNipo()">✅ NIPO DARASANI LEO</button>
+<p id="nipoMsg" style="text-align:center;color:#27ae60;font-weight:700"></p>
 </div>
 <audio id="alarmSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+<div style="text-align:center;margin-top:10px"><button onclick="logout()" style="background:rgba(255,255,255,0.3);border:none;color:white;padding:8px 15px;border-radius:20px;font-size:11px">Toka</button></div>
 </div>
+
 <script>
 const EXAM_DATE = new Date("2026-12-15T08:00:00");
-const ratiba = {
-0: [],
-1: [{somo:"Database Lab",muda:"8:00-10:00",startH:8,chumba:"Lab 2"}, {somo:"English",muda:"11:00-13:00",startH:11,chumba:"LH 1"}],
-2: [{somo:"Calculus",muda:"10:00-12:00",startH:10,chumba:"LH 3"}],
-3: [{somo:"Networking",muda:"8:00-10:00",startH:8,chumba:"Lab 1"}, {somo:"Programming",muda:"14:00-16:00",startH:14,chumba:"Lab 2"}],
-4: [{somo:"System Analysis",muda:"9:00-11:00",startH:9,chumba:"LH 2"}],
-5: [],
-6: []
-};
-const siku = ["Jumapili","Jumatatu","Jumanne","Jumatano","Alhamisi","Ijumaa","Jumamosi"];
+const ratiba = {0:[],1:[{somo:"Database Lab",muda:"8:00-10:00",startH:8,chumba:"Lab 2"},{somo:"English",muda:"11:00-13:00",startH:11,chumba:"LH 1"}],2:[{somo:"Calculus",muda:"10:00-12:00",startH:10,chumba:"LH 3"}],3:[{somo:"Networking",muda:"8:00-10:00",startH:8,chumba:"Lab 1"},{somo:"Programming",muda:"14:00-16:00",startH:14,chumba:"Lab 2"}],4:[{somo:"System Analysis",muda:"9:00-11:00",startH:9,chumba:"LH 2"}],5:[],6:[]};
+const siku=["Jumapili","Jumatatu","Jumanne","Jumatano","Alhamisi","Ijumaa","Jumamosi"];
 function register(){let n=document.getElementById('regName').value; if(n.length<3){alert("Weka jina");return;} localStorage.setItem('sc_name',n); showMain();}
-function showMain(){let name=localStorage.getItem('sc_name'); if(!name) return; document.getElementById('loginPage').classList.add('hidden'); document.getElementById('mainPage').classList.remove('hidden'); document.getElementById('welcomeText').innerText="Habari, "+name+"!"; let leo=new Date(); document.getElementById('todayDate').innerText="Leo ni "+siku[leo.getDay()]+" - "+leo.toLocaleDateString('sw-TZ'); updateCountdown(); setInterval(updateCountdown,60000); renderToday(); checkAlarmPermission(); setInterval(checkAlarm,60000);}
-function updateCountdown(){let now=new Date(); let diff=EXAM_DATE - now; let days=Math.ceil(diff/(1000*60*60*24)); if(days<0) days=0; document.getElementById('examCountdown').innerText="Siku "+days+" hadi Mtihani"; if(now.getHours()===18 && now.getMinutes()===0){ renderToday(); }}
-function renderToday(){let leo=new Date(); let num=leo.getDay(); let list=ratiba[num]||[]; document.getElementById('todayTitle').innerText="Vipindi vya Leo - "+siku[num]+" ("+list.length+")"; let html=""; if(list.length===0){html="<p>Hakuna vipindi leo. Pumzika au soma mtihani!</p>"} else{list.forEach(r=>{html+=`<div class="card today-class"><b>${r.somo}</b><br><small>${r.muda} | ${r.chumba}</small></div>`});} document.getElementById('todayList').innerHTML=html;}
-function enableAlarm(){Notification.requestPermission().then(p=>{if(p==="granted"){localStorage.setItem('sc_alarm','on'); document.getElementById('alarmStatus').classList.remove('hidden'); document.getElementById('alarmBtn').innerText="✅ Alarm Imewashwa"; alert("Alarm imewezeshwa! Utapata notification saa 1 kabla ya kipindi.");}});}
+function showMain(){let name=localStorage.getItem('sc_name'); if(!name) return; document.getElementById('loginPage').classList.add('hidden'); document.getElementById('mainPage').classList.remove('hidden'); document.getElementById('welcomeText').innerText="Habari, "+name+"! 👨‍🎓"; let leo=new Date(); document.getElementById('todayDate').innerText="Leo ni "+siku[leo.getDay()]+" - "+leo.toLocaleDateString('sw-TZ'); updateCountdown(); setInterval(updateCountdown,60000); renderToday(); checkAlarmPermission(); setInterval(checkAlarm,60000);}
+function updateCountdown(){let now=new Date(); let diff=EXAM_DATE-now; let days=Math.ceil(diff/(1000*60*60*24)); if(days<0) days=0; document.getElementById('examCountdown').innerText="Siku "+days; if(now.getHours()===18 && now.getMinutes()===0){renderToday();}}
+function renderToday(){let leo=new Date(); let num=leo.getDay(); let list=ratiba[num]||[]; document.getElementById('todayTitle').innerText="📅 Vipindi vya Leo - "+siku[num]+" ("+list.length+")"; let html=""; if(list.length===0){html="<div style='text-align:center;padding:20px;color:#888'>😴 Hakuna vipindi leo<br><small>Pumzika au soma kwa Mtihani!</small></div>"} else{list.forEach(r=>{html+=`<div class="today-card"><b>📚 ${r.somo}</b><br><small>⏰ ${r.muda} | 📍 ${r.chumba}</small></div>`});} document.getElementById('todayList').innerHTML=html;}
+function enableAlarm(){Notification.requestPermission().then(p=>{if(p==="granted"){localStorage.setItem('sc_alarm','on'); document.getElementById('alarmStatus').classList.remove('hidden'); document.getElementById('alarmBtn').innerText="✅ Alarm Imewashwa"; alert("Hongera! Alarm imewezeshwa. Utapata kelele saa 1 kabla ya kipindi.");}});}
 function checkAlarmPermission(){if(localStorage.getItem('sc_alarm')==='on' && Notification.permission==='granted'){document.getElementById('alarmStatus').classList.remove('hidden'); document.getElementById('alarmBtn').innerText="✅ Alarm Imewashwa";}}
-function checkAlarm(){if(localStorage.getItem('sc_alarm')!=='on' || Notification.permission!=='granted') return; let now=new Date(); let num=now.getDay(); let currentH=now.getHours(); let currentM=now.getMinutes(); (ratiba[num]||[]).forEach(r=>{if(r.startH -1 === currentH && currentM===0){let key='notified_'+now.toDateString()+'_'+r.somo; if(localStorage.getItem(key)) return; localStorage.setItem(key,'1'); document.getElementById('alarmSound').play(); new Notification("🔔 SMART CLASS - Jiandae!", {body:`${r.somo} inaanza saa ${r.muda} chumba ${r.chumba}. Jiandae sasa!`});}});}
-function markNipo(){let name=localStorage.getItem('sc_name'); let todayStr=new Date().toDateString(); localStorage.setItem('sc_last_'+name,todayStr); document.getElementById('nipoMsg').innerText="Upo darasani leo ✅";}
+function checkAlarm(){if(localStorage.getItem('sc_alarm')!=='on' || Notification.permission!=='granted') return; let now=new Date(); let num=now.getDay(); let currentH=now.getHours(); let currentM=now.getMinutes(); (ratiba[num]||[]).forEach(r=>{if(r.startH-1===currentH && currentM===0){let key='notified_'+now.toDateString()+'_'+r.somo; if(localStorage.getItem(key)) return; localStorage.setItem(key,'1'); document.getElementById('alarmSound').play(); new Notification("🔔 SMART CLASS - Jiandae!",{body:`${r.somo} inaanza saa ${r.muda} chumba ${r.chumba}. Jiandae sasa!`});}});}
+function markNipo(){let name=localStorage.getItem('sc_name'); let todayStr=new Date().toDateString(); localStorage.setItem('sc_last_'+name,todayStr); document.getElementById('nipoMsg').innerText="✅ Upo darasani leo - Hongera!";}
 function logout(){localStorage.removeItem('sc_name'); location.reload();}
 showMain();
 </script>
