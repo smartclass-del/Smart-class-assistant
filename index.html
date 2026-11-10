@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SMART CLASS V22 - QR FIX</title>
+<title>SMART CLASS V24 - CODE FIX</title>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
 *{box-sizing:border-box}
@@ -15,7 +15,6 @@ body{background:#eef2f7;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-ser
 .btn2{background:#0a2a5e;color:white;border:none;padding:11px;width:100%;border-radius:10px;font-weight:bold;margin-top:6px}
 .btnDel{background:#ef4444;color:white;border:none;padding:4px 9px;border-radius:6px;float:right;font-size:12px}
 .btnGreen{background:#22c55e;color:white;border:none;padding:14px;width:100%;border-radius:12px;font-weight:800;font-size:15px;margin-top:8px}
-.btnCamera{background:#0a2a5e;color:white;border:none;padding:16px;width:100%;border-radius:14px;font-weight:800;font-size:16px;margin-top:10px}
 input,select{width:100%;padding:13px;margin:6px 0;border-radius:12px;border:1.5px solid #e2e8f0;background:#f8fafc;font-size:14px}
 .hidden{display:none}
 .hero{background:linear-gradient(135deg,#0a2a5e,#1a56db);color:white;border-radius:20px;padding:20px;text-align:center}
@@ -37,8 +36,6 @@ input,select{width:100%;padding:13px;margin:6px 0;border-radius:12px;border:1.5p
 label{font-size:12px;font-weight:700;color:#0a2a5e}
 h4{margin:18px 0 6px 0;color:#0a2a5e;border-bottom:2px solid #facc15;padding-bottom:4px;font-size:14px}
 .badge{display:inline-block;background:#fef3c7;color:#92400e;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700}
-#reader{width:100%;border-radius:12px;overflow:hidden;margin-top:10px;border:2px solid #0a2a5e}
-.scanHint{background:#eff6ff;border:1px solid #bfdbfe;padding:10px;border-radius:10px;font-size:12px;color:#1e40af;text-align:center;margin-top:8px}
 </style>
 </head>
 <body>
@@ -55,19 +52,19 @@ h4{margin:18px 0 6px 0;color:#0a2a5e;border-bottom:2px solid #facc15;padding-bot
 
 <div id="checkinCard" class="card hidden" style="border:2px solid #facc15;text-align:center">
 <span class="badge">🔒 LAZIMA UWE DARASANI</span>
-<h2 style="color:#0a2a5e;margin:10px 0 4px 0">Scan QR ya CR</h2>
-<p style="font-size:13px;color:#64748b;margin:0">Shikilia simu cm 20 kutoka kwenye QR ya CR, usiisogeze kwa sekunde 3</p>
-<button id="btnOpenCam" class="btnCamera" onclick="funguaCamera()">📷 FUNGUA CAMERA KU-SCAN</button>
-<div id="reader" class="hidden"></div>
-<div id="scanStatus" class="scanHint hidden">📷 Camera imefunguka... Shikilia tulia kwenye QR</div>
-<button id="btnCloseCam" class="btn2 hidden" style="background:#64748b" onclick="fungaCamera()">✖️ Funga Camera</button>
-<div style="margin-top:14px;background:#fef3c7;padding:12px;border-radius:12px">
-<p style="font-size:12px;font-weight:700;margin:0">⚡ NJIA YA HARAKA KAMA CAMERA IKIGOMA:</p>
-<p style="font-size:12px;margin:4px 0">Angalia namba kubwa chini ya QR ya CR, andika hapa:</p>
-<input id="qrCodeInput" placeholder="Andika namba 4 - mf: 9374" style="text-align:center;font-size:22px;font-weight:900;letter-spacing:6px">
-<button class="btnGreen" onclick="thibitishaQRManual()">✅ INGIA KWA NAMBA</button>
+<h2 style="color:#0a2a5e;margin:10px 0 4px 0">Uko Darasani?</h2>
+<p style="font-size:13px;color:#64748b;margin:0">Uliza CR akuonyeshe QR / Namba ya leo, kisha andika hapa chini</p>
+<div style="font-size:60px;margin:10px 0">📷</div>
+<div style="background:#fef3c7;padding:14px;border-radius:12px">
+<p style="font-size:13px;font-weight:800;margin:0">ANDIKA NAMBA YA LEO KUTOKA KWA CR</p>
+<input id="qrCodeInput" placeholder="Namba 4 - mf: 4821" style="text-align:center;font-size:26px;font-weight:900;letter-spacing:8px;margin-top:8px">
+<button class="btnGreen" onclick="thibitishaQRManual()">✅ NIKO DARASANI - INGIA</button>
 </div>
+<p style="font-size:12px;color:#64748b;margin:10px 0 4px 0">Au Piga Picha ya QR ya CR:</p>
+<label for="qrFile" style="display:block;background:#0a2a5e;color:white;padding:13px;border-radius:12px;font-weight:800">📸 PIGA PICHA YA QR YA CR</label>
+<input id="qrFile" type="file" accept="image/*" capture="environment" style="display:none" onchange="somaPicha(this)">
 <p id="qrErr" style="color:#ef4444;font-size:12px;font-weight:bold"></p>
+<p id="qrDebug" style="font-size:11px;color:#64748b"></p>
 </div>
 
 <div id="dashboardContent">
@@ -95,13 +92,11 @@ h4{margin:18px 0 6px 0;color:#0a2a5e;border-bottom:2px solid #facc15;padding-bot
 <button class="btn" style="margin-top:15px;background:#ef4444;color:white" onclick="resetAll()">🗑️ RUDISHA KAMA MWANZO</button></div>
 
 <div id="tMahudhurio" class="card hidden" style="border:2px solid #22c55e">
-<p class="sectionTitle">👥 Mahudhurio - CR Tu</p><p class="sub">Weka Brightness 100% ili wanafunzi waiscan haraka</p>
+<p class="sectionTitle">👥 Mahudhurio - CR Tu</p><p class="sub">Namba hii ni ile ile kwa simu zote leo. Inabadilika kesho.</p>
 <div class="qrBox">
-<p style="font-weight:800;color:#0a2a5e;margin:0 0 8px 0">QR YA LEO</p>
-<img id="qrImg" src="" alt="QR Code">
-<div class="codeBig" id="qrCodeText">----</div>
-<p style="font-size:12px;color:#64748b;margin:0">Wanafunzi wakishindwa ku-scan, waambie waandike namba hii</p>
-<button class="btn2" onclick="badilishaCode()">🔄 BADILISHA CODE MPYA</button>
+<p style="font-weight:800;color:#0a2a5e;margin:0 0 8px 0">QR YA LEO - WAFUNZI WAI-SCAN / WAANDIKE NAMBA</p>
+<img id="qrImg" src="" alt="QR Code"><div class="codeBig" id="qrCodeText">----</div>
+<p style="font-size:12px;color:#64748b;margin:0">Waambie wanafunzi waandike namba hii. Ni rahisi kuliko scan.</p>
 </div>
 <h4>✅ Waliothibitika Leo (<span id="countPresent">0</span>)</h4><div id="listPresent"></div>
 <button class="btn2" style="background:#ef4444" onclick="futaMahudhurio()">🗑️ Futa Mahudhurio ya Leo</button>
@@ -119,55 +114,52 @@ const DEFAULT_EXAM="2026-12-15T08:00:00";
 function load(k,def){try{let v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch(e){return def;}}
 let RATIBA=load('SC_RATIBA',DEFAULT_RATIBA);let WALIMU=load('SC_WALIMU',DEFAULT_WALIMU);let VITABU=load('SC_VITABU',DEFAULT_VITABU);let TANGAZO=load('SC_TANGAZO',DEFAULT_TANGAZO);let EXAM_DATE_STR=localStorage.getItem('SC_EXAM')||DEFAULT_EXAM;
 let TODAY=new Date().toISOString().slice(0,10);
-function getTodayCode(){let saved=JSON.parse(localStorage.getItem('SC_QR')||'null');if(saved&&saved.date===TODAY)return saved.code;let code=Math.floor(1000+Math.random()*9000).toString();localStorage.setItem('SC_QR',JSON.stringify({date:TODAY,code:code}));return code;}
-function badilishaCode(){let code=Math.floor(1000+Math.random()*9000).toString();localStorage.setItem('SC_QR',JSON.stringify({date:TODAY,code:code}));renderQR();alert("Code mpya: "+code);}
+// *** FIX KUBWA: CODE INATOKA KWENYE TAREHE, SIO BAHATI NASIBU - SIMU ZOTE ZINAPATA ILE ILE ***
+function getTodayCode(){
+  let d=new Date();
+  let day=d.getDate(); let month=d.getMonth()+1; let year=d.getFullYear();
+  let num = (day*137 + month*71 + (year%100)*13 + 1234) % 9000 + 1000;
+  return String(num);
+}
 function renderQR(){let code=getTodayCode();document.getElementById('qrCodeText').innerText=code;document.getElementById('qrImg').src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=20&color=000000&bgcolor=FFFFFF&data="+code;}
 function getAttendance(){let a=JSON.parse(localStorage.getItem('SC_ATT')||'null');if(!a||a.date!==TODAY)return {date:TODAY,list:[]};return a;}
 function saveAttendance(a){localStorage.setItem('SC_ATT',JSON.stringify(a));renderAttendance();}
 function renderAttendance(){let a=getAttendance();document.getElementById('countPresent').innerText=a.list.length;let h="";if(a.list.length==0)h="<p style='text-align:center;color:#94a3b8'>Bado hakuna aliyefika leo</p>";else a.list.forEach(s=>{h+=`<div class="item"><b>${s.name}</b> <span style="float:right;font-size:12px">✅ ${s.time}</span><br><small>Code: ${s.code}</small></div>`});document.getElementById('listPresent').innerHTML=h;}
 function futaMahudhurio(){if(confirm("Futa mahudhurio ya leo?")){localStorage.removeItem('SC_ATT');renderAttendance();}}
-let html5Qr=null; let scanning=false;
-function funguaCamera(){
-  document.getElementById('reader').classList.remove('hidden');
-  document.getElementById('scanStatus').classList.remove('hidden');
-  document.getElementById('btnCloseCam').classList.remove('hidden');
-  document.getElementById('btnOpenCam').innerText="📷 Camera Inascan... Shikilia tulia";
-  if(scanning) return; scanning=true;
-  html5Qr=new Html5Qrcode("reader");
-  html5Qr.start({facingMode:"environment"}, {fps:15, qrbox:{width:280,height:280}, aspectRatio:1.0}, onScanSuccess, ()=>{}).catch(err=>{
-    document.getElementById('qrErr').innerText="❌ Ruhusu Camera kwanza! Au tumia Namba hapo chini - ni haraka zaidi.";
-    scanning=false;
+function somaPicha(input){
+  let file=input.files[0]; if(!file) return;
+  document.getElementById('qrErr').innerText="⏳ Inasoma picha...";
+  let qr = new Html5Qrcode("readerTemp");
+  // Tumia div ya muda
+  let tmp=document.createElement('div'); tmp.id="readerTemp"; tmp.style.display="none"; document.body.appendChild(tmp);
+  let qr2 = new Html5Qrcode("readerTemp");
+  qr2.scanFile(file, true).then(decoded=>{
+    let code=decoded.trim();
+    let real=getTodayCode();
+    if(code===real){ thibitishaKuingia(code,true); }
+    else { document.getElementById('qrErr').innerText="❌ Picha hii sio QR ya leo. Umescan: "+code+" - Inatakiwa: "+real; }
+    tmp.remove();
+  }).catch(e=>{
+    document.getElementById('qrErr').innerText="❌ Picha haikusomeka. Andika Namba hapo juu - ni rahisi zaidi.";
+    tmp.remove();
   });
-}
-function fungaCamera(){
-  if(html5Qr && scanning){ html5Qr.stop().then(()=>{scanning=false;}).catch(()=>{}); }
-  document.getElementById('reader').classList.add('hidden');
-  document.getElementById('scanStatus').classList.add('hidden');
-  document.getElementById('btnCloseCam').classList.add('hidden');
-  document.getElementById('btnOpenCam').innerText="📷 FUNGUA CAMERA KU-SCAN";
-}
-function onScanSuccess(decodedText){
-  let code=decodedText.trim();
-  if(decodedText.includes("-")){ let parts=decodedText.split("-"); code=parts[parts.length-1].trim(); }
-  // Sasa QR ina namba 4 tu, rahisi sana kuisoma
-  let real=getTodayCode();
-  if(code===real){
-    if(html5Qr && scanning){ html5Qr.stop().then(()=>{scanning=false;}); }
-    thibitishaKuingia(code, true);
-  } else {
-    document.getElementById('qrErr').innerText="❌ Hii sio QR ya leo! Code uliyo-scan: "+code+" - Uliza CR akuonyeshe QR mpya.";
-  }
+  input.value="";
 }
 function thibitishaKuingia(code, fromScan){
   let n=localStorage.getItem('N'); let a=getAttendance();
-  if(a.list.find(x=>x.name.toLowerCase()===n.toLowerCase())){ fungaCamera(); checkAttendance(); return; }
+  if(a.list.find(x=>x.name.toLowerCase()===n.toLowerCase())){ checkAttendance(); return; }
   let time=new Date().toLocaleTimeString('sw-TZ',{hour:'2-digit',minute:'2-digit'});
   a.list.push({name:n,time:time,code:code}); saveAttendance(a);
-  fungaCamera();
-  alert("✅ Karibu darasani, "+n+"! Umescan vizuri.");
+  alert("✅ Karibu darasani, "+n+"! Code sahihi.");
   checkAttendance();
 }
-function thibitishaQRManual(){ let input=document.getElementById('qrCodeInput').value.trim(); let real=getTodayCode(); if(input!==real){document.getElementById('qrErr').innerText="❌ Code sio sahihi! Angalia namba kubwa chini ya QR ya CR.";return;} thibitishaKuingia(input,false); }
+function thibitishaQRManual(){
+  let input=document.getElementById('qrCodeInput').value.trim();
+  let real=getTodayCode();
+  document.getElementById('qrDebug').innerText="Code yako: "+input+" | Code ya leo: "+real;
+  if(input!==real){document.getElementById('qrErr').innerText="❌ Code sio sahihi! Angalia namba kubwa chini ya QR ya CR. Inatakiwa: "+real;return;}
+  thibitishaKuingia(input,false);
+}
 function isAdmin(){let n=localStorage.getItem('N')||"";let p=localStorage.getItem('P')||"";return n.toLowerCase().includes("godfrey")&&p==="1234";}
 function checkAttendance(){if(isAdmin()){document.getElementById('checkinCard').classList.add('hidden');document.getElementById('dashboardContent').classList.remove('hidden');document.getElementById('attendanceStatus').innerText="👑 Uko kama CR - Huhitaji QR";return;}let a=getAttendance();let n=localStorage.getItem('N')||"";let found=a.list.find(x=>x.name.toLowerCase()===n.toLowerCase());if(found){document.getElementById('checkinCard').classList.add('hidden');document.getElementById('dashboardContent').classList.remove('hidden');document.getElementById('attendanceStatus').innerText="✅ Umethibitika leo - "+found.time;}else{document.getElementById('checkinCard').classList.remove('hidden');document.getElementById('dashboardContent').classList.add('hidden');}}
 function saveAll(){localStorage.setItem('SC_RATIBA',JSON.stringify(RATIBA));localStorage.setItem('SC_WALIMU',JSON.stringify(WALIMU));localStorage.setItem('SC_VITABU',JSON.stringify(VITABU));localStorage.setItem('SC_TANGAZO',JSON.stringify(TANGAZO));localStorage.setItem('SC_EXAM',EXAM_DATE_STR);renderAll();renderAdmin();}
