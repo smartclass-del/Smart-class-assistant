@@ -3,18 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SMART CLASS V20 - QR MAHUDHURIO</title>
+<title>SMART CLASS V21 - SCAN KWA CAMERA</title>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
 *{box-sizing:border-box}
 body{background:#eef2f7;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;padding-bottom:20px}
 .topbar{background:linear-gradient(135deg,#0a2a5e,#1a56db);color:white;padding:18px 16px 28px 16px;text-align:center;border-radius:0 0 25px 25px}
 .topbar h1{margin:0;font-size:22px}
-.topbar p{margin:4px 0 0 0;font-size:12px;opacity:.85}
 .card{background:white;border-radius:18px;padding:18px;margin:12px 12px 0 12px;box-shadow:0 4px 18px rgba(0,0,0,.08)}
 .btn{background:linear-gradient(90deg,#facc15,#f1c40f);color:#0a2a5e;border:none;padding:14px;width:100%;border-radius:12px;font-weight:800;font-size:15px}
 .btn2{background:#0a2a5e;color:white;border:none;padding:11px;width:100%;border-radius:10px;font-weight:bold;margin-top:6px}
 .btnDel{background:#ef4444;color:white;border:none;padding:4px 9px;border-radius:6px;float:right;font-size:12px}
-.btnGreen{background:#22c55e;color:white;border:none;padding:13px;width:100%;border-radius:12px;font-weight:800;font-size:15px;margin-top:8px}
+.btnGreen{background:#22c55e;color:white;border:none;padding:14px;width:100%;border-radius:12px;font-weight:800;font-size:15px;margin-top:8px}
+.btnCamera{background:#0a2a5e;color:white;border:none;padding:16px;width:100%;border-radius:14px;font-weight:800;font-size:16px;margin-top:10px;box-shadow:0 6px 18px rgba(10,42,94,.3)}
 input,select{width:100%;padding:13px;margin:6px 0;border-radius:12px;border:1.5px solid #e2e8f0;background:#f8fafc;font-size:14px}
 .hidden{display:none}
 .hero{background:linear-gradient(135deg,#0a2a5e,#1a56db);color:white;border-radius:20px;padding:20px;text-align:center}
@@ -36,6 +37,9 @@ input,select{width:100%;padding:13px;margin:6px 0;border-radius:12px;border:1.5p
 label{font-size:12px;font-weight:700;color:#0a2a5e}
 h4{margin:18px 0 6px 0;color:#0a2a5e;border-bottom:2px solid #facc15;padding-bottom:4px;font-size:14px}
 .badge{display:inline-block;background:#fef3c7;color:#92400e;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700}
+#reader{width:100%;border-radius:12px;overflow:hidden;margin-top:10px}
+#reader video{border-radius:12px !important}
+.scanHint{background:#eff6ff;border:1px solid #bfdbfe;padding:10px;border-radius:10px;font-size:12px;color:#1e40af;text-align:center;margin-top:8px}
 </style>
 </head>
 <body>
@@ -50,15 +54,20 @@ h4{margin:18px 0 6px 0;color:#0a2a5e;border-bottom:2px solid #facc15;padding-bot
 <div id="main" class="hidden">
 <div class="topbar"><h1>🎓 SMART CLASS</h1><p id="leo"></p></div>
 
-<!-- CHECK-IN KWA WANAFUNZI - HAONI DARASA KABLA YA SCAN -->
+<!-- CHECK-IN RAHISI KWA MWANAFUNZI - CAMERA TU -->
 <div id="checkinCard" class="card hidden" style="border:2px solid #facc15;text-align:center">
 <span class="badge">🔒 LAZIMA UWE DARASANI</span>
-<h2 style="color:#0a2a5e;margin:10px 0 4px 0">Uko Darasani Sasa?</h2>
-<p style="font-size:13px;color:#64748b">Scan QR ya CR au andika Code aliyonayo CR ili uingie darasani</p>
-<div style="font-size:50px">📷</div>
-<input id="qrCodeInput" placeholder="Andika Code ya leo kutoka kwa CR - mf: 4821" style="text-align:center;font-size:18px;font-weight:800;letter-spacing:4px">
-<button class="btnGreen" onclick="thibitishaQR()">✅ SCAN / THIBITISHA NIKO DARASANI</button>
-<p style="font-size:11px;color:#94a3b8">Uliza CR akuonyeshe QR yake. Bila QR huwezi kuingia.</p>
+<h2 style="color:#0a2a5e;margin:10px 0 4px 0">Scan QR ya CR</h2>
+<p style="font-size:13px;color:#64748b;margin:0">Elekeza camera yako kwenye QR iliyo kwenye simu ya CR</p>
+
+<button id="btnOpenCam" class="btnCamera" onclick="funguaCamera()">📷 FUNGUA CAMERA KU-SCAN</button>
+<div id="reader" class="hidden"></div>
+<div id="scanStatus" class="scanHint hidden">📷 Camera imefunguka... Elekeza kwenye QR ya CR</div>
+<button id="btnCloseCam" class="btn2 hidden" style="background:#64748b" onclick="fungaCamera()">✖️ Funga Camera</button>
+
+<p style="font-size:12px;color:#94a3b8;margin:14px 0 4px 0">Camera haifanyi kazi? Andika Code hapa:</p>
+<input id="qrCodeInput" placeholder="Code ya leo - mf: 4821" style="text-align:center;font-size:18px;font-weight:800;letter-spacing:4px">
+<button class="btnGreen" onclick="thibitishaQRManual()">✅ THIBITISHA KWA CODE</button>
 <p id="qrErr" style="color:#ef4444;font-size:12px;font-weight:bold"></p>
 </div>
 
@@ -80,26 +89,23 @@ h4{margin:18px 0 6px 0;color:#0a2a5e;border-bottom:2px solid #facc15;padding-bot
 
 <div id="tAdmin" class="card hidden" style="border:2px solid #facc15"><p class="sectionTitle">⚙️ EDIT - Admin</p><p class="sub">Badilisha kila kitu hapa</p>
 <h4>1. 📅 Ongeza Kipindi</h4><label>Siku</label><select id="eSiku"><option value="1">Jumatatu</option><option value="2">Jumanne</option><option value="3">Jumatano</option><option value="4">Alhamisi</option><option value="5">Ijumaa</option><option value="0">Jumapili</option><option value="6">Jumamosi</option></select><input id="eSomo" placeholder="Somo"><input id="eMuda" placeholder="Muda - mf: 8:00-10:00"><input id="eChumba" placeholder="Chumba"><button class="btn2" onclick="addRatiba()">+ ONGEZA KIPINDI</button><div id="adminRatibaList"></div>
-<h4>2. 📢 Ongeza Tangazo</h4><input id="eTangazoTitle" placeholder="Kichwa cha tangazo"><input id="eTangazoBody" placeholder="Maelezo"><button class="btn2" onclick="addTangazo()">+ ONGEZA TANGAZO</button><div id="adminTangazoList"></div>
+<h4>2. 📢 Ongeza Tangazo</h4><input id="eTangazoTitle" placeholder="Kichwa"><input id="eTangazoBody" placeholder="Maelezo"><button class="btn2" onclick="addTangazo()">+ ONGEZA TANGAZO</button><div id="adminTangazoList"></div>
 <h4>3. 📚 Ongeza Kitabu</h4><input id="eKitabuTitle" placeholder="Jina la Kitabu"><input id="eKitabuLink" placeholder="Link"><button class="btn2" onclick="addKitabu()">+ ONGEZA KITABU</button><div id="adminLibList"></div>
 <h4>4. 👨‍🏫 Ongeza Mwalimu</h4><input id="eMwalimuName" placeholder="Jina la Mwalimu"><input id="eMwalimuSomo" placeholder="Somo"><input id="eMwalimuPhone" placeholder="Simu"><button class="btn2" onclick="addMwalimu()">+ ONGEZA MWALIMU</button><div id="adminWalimuList"></div>
 <h4>5. 🎯 Tarehe ya Mtihani</h4><input id="eExam" type="date"><button class="btn2" onclick="saveExam()">HIFADHI TAREHE</button>
 <button class="btn" style="margin-top:15px;background:#ef4444;color:white" onclick="resetAll()">🗑️ RUDISHA KAMA MWANZO</button></div>
 
-<!-- MAHUDHURIO - ADMIN TU ANAONA QR -->
 <div id="tMahudhurio" class="card hidden" style="border:2px solid #22c55e">
 <p class="sectionTitle">👥 Mahudhurio - CR Tu</p><p class="sub">Waonyeshe wanafunzi QR hii. Waki-scan ndio wanaingia.</p>
 <div class="qrBox">
 <p style="font-weight:800;color:#0a2a5e;margin:0">QR YA LEO - WAFUNZI WAI-SCAN</p>
-<img id="qrImg" src="" alt="QR Code">
-<div class="codeBig" id="qrCodeText">----</div>
+<img id="qrImg" src="" alt="QR Code"><div class="codeBig" id="qrCodeText">----</div>
 <p style="font-size:12px;color:#64748b;margin:0">Code hii inabadilika kila siku. Usiitume kwenye group!</p>
 <button class="btn2" onclick="badilishaCode()">🔄 BADILISHA CODE MPYA</button>
 </div>
 <h4>✅ Waliothibitika Leo (<span id="countPresent">0</span>)</h4><div id="listPresent"></div>
 <button class="btn2" style="background:#ef4444" onclick="futaMahudhurio()">🗑️ Futa Mahudhurio ya Leo</button>
 </div>
-
 </div>
 <button onclick="toka()" style="background:white;color:#0a2a5e;border:1px solid #e2e8f0;padding:8px 16px;border-radius:20px;margin:16px auto;display:block;font-weight:700">Toka</button>
 </div>
@@ -113,7 +119,6 @@ const DEFAULT_EXAM="2026-12-15T08:00:00";
 function load(k,def){try{let v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch(e){return def;}}
 let RATIBA=load('SC_RATIBA',DEFAULT_RATIBA);let WALIMU=load('SC_WALIMU',DEFAULT_WALIMU);let VITABU=load('SC_VITABU',DEFAULT_VITABU);let TANGAZO=load('SC_TANGAZO',DEFAULT_TANGAZO);let EXAM_DATE_STR=localStorage.getItem('SC_EXAM')||DEFAULT_EXAM;
 let TODAY=new Date().toISOString().slice(0,10);
-// --- QR CODE YA LEO - ADMIN TU ---
 function getTodayCode(){let saved=JSON.parse(localStorage.getItem('SC_QR')||'null');if(saved&&saved.date===TODAY)return saved.code;let code=Math.floor(1000+Math.random()*9000).toString();localStorage.setItem('SC_QR',JSON.stringify({date:TODAY,code:code}));return code;}
 function badilishaCode(){let code=Math.floor(1000+Math.random()*9000).toString();localStorage.setItem('SC_QR',JSON.stringify({date:TODAY,code:code}));renderQR();alert("Code mpya: "+code);}
 function renderQR(){let code=getTodayCode();document.getElementById('qrCodeText').innerText=code;document.getElementById('qrImg').src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=SMARTCLASS-"+TODAY+"-"+code;}
@@ -121,7 +126,50 @@ function getAttendance(){let a=JSON.parse(localStorage.getItem('SC_ATT')||'null'
 function saveAttendance(a){localStorage.setItem('SC_ATT',JSON.stringify(a));renderAttendance();}
 function renderAttendance(){let a=getAttendance();document.getElementById('countPresent').innerText=a.list.length;let h="";if(a.list.length==0)h="<p style='text-align:center;color:#94a3b8'>Bado hakuna aliyefika leo</p>";else a.list.forEach(s=>{h+=`<div class="item"><b>${s.name}</b> <span style="float:right;font-size:12px">✅ ${s.time}</span><br><small>Code: ${s.code}</small></div>`});document.getElementById('listPresent').innerHTML=h;}
 function futaMahudhurio(){if(confirm("Futa mahudhurio ya leo?")){localStorage.removeItem('SC_ATT');renderAttendance();}}
-function thibitishaQR(){let input=document.getElementById('qrCodeInput').value.trim();let real=getTodayCode();if(input!==real){document.getElementById('qrErr').innerText="❌ Code sio sahihi! Uliza CR akuonyeshe QR ya leo.";return;}let n=localStorage.getItem('N');let a=getAttendance();if(a.list.find(x=>x.name.toLowerCase()===n.toLowerCase())){document.getElementById('qrErr').innerText="Ulishathibitisha tayari!";return;}let time=new Date().toLocaleTimeString('sw-TZ',{hour:'2-digit',minute:'2-digit'});a.list.push({name:n,time:time,code:input});saveAttendance(a);alert("✅ Karibu darasani, "+n+"!");checkAttendance();}
+// --- SCAN KWA CAMERA ---
+let html5Qr=null; let scanning=false;
+function funguaCamera(){
+  document.getElementById('reader').classList.remove('hidden');
+  document.getElementById('scanStatus').classList.remove('hidden');
+  document.getElementById('btnCloseCam').classList.remove('hidden');
+  document.getElementById('btnOpenCam').innerText="📷 Camera Inascan...";
+  if(scanning) return; scanning=true;
+  html5Qr=new Html5Qrcode("reader");
+  html5Qr.start({facingMode:"environment"}, {fps:10, qrbox:{width:220,height:220}}, onScanSuccess, ()=>{}).catch(err=>{
+    document.getElementById('qrErr').innerText="❌ Ruhusu Camera kwanza! Au tumia Code hapo chini.";
+    scanning=false;
+  });
+}
+function fungaCamera(){
+  if(html5Qr && scanning){ html5Qr.stop().then(()=>{scanning=false;}).catch(()=>{}); }
+  document.getElementById('reader').classList.add('hidden');
+  document.getElementById('scanStatus').classList.add('hidden');
+  document.getElementById('btnCloseCam').classList.add('hidden');
+  document.getElementById('btnOpenCam').innerText="📷 FUNGUA CAMERA KU-SCAN";
+}
+function onScanSuccess(decodedText){
+  // QR inakuja kama SMARTCLASS-2026-11-10-4821 au 4821 tu
+  let code=decodedText;
+  if(decodedText.includes("-")){ let parts=decodedText.split("-"); code=parts[parts.length-1]; }
+  code=code.trim();
+  let real=getTodayCode();
+  if(code===real){
+    if(html5Qr && scanning){ html5Qr.stop().then(()=>{scanning=false;}); }
+    thibitishaKuingia(code, true);
+  } else {
+    document.getElementById('qrErr').innerText="❌ Hii sio QR ya leo! Uliza CR akuonyeshe QR mpya.";
+  }
+}
+function thibitishaKuingia(code, fromScan){
+  let n=localStorage.getItem('N'); let a=getAttendance();
+  if(a.list.find(x=>x.name.toLowerCase()===n.toLowerCase())){ fungaCamera(); checkAttendance(); return; }
+  let time=new Date().toLocaleTimeString('sw-TZ',{hour:'2-digit',minute:'2-digit'});
+  a.list.push({name:n,time:time,code:code}); saveAttendance(a);
+  fungaCamera();
+  alert("✅ Karibu darasani, "+n+"! Umescan vizuri.");
+  checkAttendance();
+}
+function thibitishaQRManual(){ let input=document.getElementById('qrCodeInput').value.trim(); let real=getTodayCode(); if(input!==real){document.getElementById('qrErr').innerText="❌ Code sio sahihi! Uliza CR akuonyeshe QR ya leo.";return;} thibitishaKuingia(input,false); }
 function isAdmin(){let n=localStorage.getItem('N')||"";let p=localStorage.getItem('P')||"";return n.toLowerCase().includes("godfrey")&&p==="1234";}
 function checkAttendance(){if(isAdmin()){document.getElementById('checkinCard').classList.add('hidden');document.getElementById('dashboardContent').classList.remove('hidden');document.getElementById('attendanceStatus').innerText="👑 Uko kama CR - Huhitaji QR";return;}let a=getAttendance();let n=localStorage.getItem('N')||"";let found=a.list.find(x=>x.name.toLowerCase()===n.toLowerCase());if(found){document.getElementById('checkinCard').classList.add('hidden');document.getElementById('dashboardContent').classList.remove('hidden');document.getElementById('attendanceStatus').innerText="✅ Umethibitika leo - "+found.time;}else{document.getElementById('checkinCard').classList.remove('hidden');document.getElementById('dashboardContent').classList.add('hidden');}}
 function saveAll(){localStorage.setItem('SC_RATIBA',JSON.stringify(RATIBA));localStorage.setItem('SC_WALIMU',JSON.stringify(WALIMU));localStorage.setItem('SC_VITABU',JSON.stringify(VITABU));localStorage.setItem('SC_TANGAZO',JSON.stringify(TANGAZO));localStorage.setItem('SC_EXAM',EXAM_DATE_STR);renderAll();renderAdmin();}
