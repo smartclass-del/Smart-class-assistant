@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SMART CLASS V24 - CODE FIX</title>
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<title>SMART CLASS V26 - FIREBASE LIVE</title>
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <style>
 *{box-sizing:border-box}
 body{background:#eef2f7;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;padding-bottom:20px}
@@ -29,42 +31,38 @@ input,select{width:100%;padding:13px;margin:6px 0;border-radius:12px;border:1.5p
 .nav button.active{background:#0a2a5e;color:white}
 .item{border-left:4px solid #22c55e;background:#f0fdf4;padding:12px;border-radius:12px;margin:8px 0}
 .qrBox{text-align:center;background:white;border:3px solid #0a2a5e;border-radius:16px;padding:10px;margin:10px 0}
-.qrBox img{width:280px;height:280px;max-width:100%}
+.qrBox img{width:200px;height:200px;max-width:100%}
 .codeBig{font-size:36px;font-weight:900;letter-spacing:8px;color:#0a2a5e;margin:8px 0}
 .sectionTitle{font-size:16px;font-weight:800;color:#0f172a;margin:0}
 .sub{font-size:12px;color:#64748b;margin:4px 0 10px 0}
 label{font-size:12px;font-weight:700;color:#0a2a5e}
 h4{margin:18px 0 6px 0;color:#0a2a5e;border-bottom:2px solid #facc15;padding-bottom:4px;font-size:14px}
 .badge{display:inline-block;background:#fef3c7;color:#92400e;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.liveDot{display:inline-block;width:10px;height:10px;background:#22c55e;border-radius:50%;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 </style>
 </head>
 <body>
 
 <div id="login">
-<div class="topbar"><h1>🎓 SMART CLASS</h1><p>Darasa lako - Kila kitu mahali pamoja</p></div>
+<div class="topbar"><h1>🎓 SMART CLASS</h1><p>Darasa lako - Kila kitu mahali pamoja</p><p id="firebaseStatus" style="font-size:11px">⏳ Inajiunganisha na Firebase...</p></div>
 <div class="card" style="text-align:center"><h2 style="margin:0;color:#0a2a5e">Karibu Tena 👋</h2><p style="font-size:13px;color:#64748b">Ingia kuona Ratiba, Matangazo na Notes</p>
 <input id="name" placeholder="Jina lako"><input id="pass" type="password" placeholder="Password ya Darasa">
 <button class="btn" onclick="ingia()">INGIA →</button><p id="err" style="color:#ef4444;font-size:12px;font-weight:bold"></p></div>
 </div>
 
 <div id="main" class="hidden">
-<div class="topbar"><h1>🎓 SMART CLASS</h1><p id="leo"></p></div>
+<div class="topbar"><h1>🎓 SMART CLASS</h1><p id="leo"></p><p style="font-size:11px"><span class="liveDot"></span> LIVE - Firebase Imeunganishwa</p></div>
 
 <div id="checkinCard" class="card hidden" style="border:2px solid #facc15;text-align:center">
 <span class="badge">🔒 LAZIMA UWE DARASANI</span>
 <h2 style="color:#0a2a5e;margin:10px 0 4px 0">Uko Darasani?</h2>
-<p style="font-size:13px;color:#64748b;margin:0">Uliza CR akuonyeshe QR / Namba ya leo, kisha andika hapa chini</p>
-<div style="font-size:60px;margin:10px 0">📷</div>
-<div style="background:#fef3c7;padding:14px;border-radius:12px">
-<p style="font-size:13px;font-weight:800;margin:0">ANDIKA NAMBA YA LEO KUTOKA KWA CR</p>
-<input id="qrCodeInput" placeholder="Namba 4 - mf: 4821" style="text-align:center;font-size:26px;font-weight:900;letter-spacing:8px;margin-top:8px">
+<p style="font-size:13px;color:#64748b;margin:0">Andika namba ya leo kutoka kwa CR, CR atakuona papo hapo!</p>
+<div style="background:#fef3c7;padding:14px;border-radius:12px;margin-top:10px">
+<input id="qrCodeInput" placeholder="Namba 4 - mf: 4821" style="text-align:center;font-size:26px;font-weight:900;letter-spacing:8px">
 <button class="btnGreen" onclick="thibitishaQRManual()">✅ NIKO DARASANI - INGIA</button>
 </div>
-<p style="font-size:12px;color:#64748b;margin:10px 0 4px 0">Au Piga Picha ya QR ya CR:</p>
-<label for="qrFile" style="display:block;background:#0a2a5e;color:white;padding:13px;border-radius:12px;font-weight:800">📸 PIGA PICHA YA QR YA CR</label>
-<input id="qrFile" type="file" accept="image/*" capture="environment" style="display:none" onchange="somaPicha(this)">
 <p id="qrErr" style="color:#ef4444;font-size:12px;font-weight:bold"></p>
-<p id="qrDebug" style="font-size:11px;color:#64748b"></p>
 </div>
 
 <div id="dashboardContent">
@@ -76,14 +74,14 @@ h4{margin:18px 0 6px 0;color:#0a2a5e;border-bottom:2px solid #facc15;padding-bot
 <button id="b3" onclick="tab('lib')">📚 Library</button>
 <button id="b4" onclick="tab('walimu')">👨‍🏫 Walimu</button>
 <button id="b5" class="hidden" onclick="tab('admin')">⚙️ EDIT</button>
-<button id="b6" class="hidden" onclick="tab('mahudhurio')">👥 Mahudhurio</button>
+<button id="b6" class="hidden" onclick="tab('mahudhurio')">👥 Mahudhurio LIVE</button>
 </div>
 <div id="tRatiba" class="card"><p class="sectionTitle">📅 Vipindi Vya Leo</p><div id="listRatiba"></div></div>
 <div id="tTangazo" class="card hidden"><p class="sectionTitle">📢 Matangazo</p><div id="listTangazo"></div></div>
 <div id="tLib" class="card hidden"><p class="sectionTitle">📚 Library</p><div id="listLib"></div></div>
 <div id="tWalimu" class="card hidden"><p class="sectionTitle">👨‍🏫 Walimu</p><div id="listWalimu"></div></div>
 
-<div id="tAdmin" class="card hidden" style="border:2px solid #facc15"><p class="sectionTitle">⚙️ EDIT - Admin</p><p class="sub">Badilisha kila kitu hapa</p>
+<div id="tAdmin" class="card hidden" style="border:2px solid #facc15"><p class="sectionTitle">⚙️ EDIT - Admin</p><p class="sub">Badilisha kila kitu hapa - inabadilika kwa kila mtu LIVE!</p>
 <h4>1. 📅 Ongeza Kipindi</h4><label>Siku</label><select id="eSiku"><option value="1">Jumatatu</option><option value="2">Jumanne</option><option value="3">Jumatano</option><option value="4">Alhamisi</option><option value="5">Ijumaa</option><option value="0">Jumapili</option><option value="6">Jumamosi</option></select><input id="eSomo" placeholder="Somo"><input id="eMuda" placeholder="Muda"><input id="eChumba" placeholder="Chumba"><button class="btn2" onclick="addRatiba()">+ ONGEZA KIPINDI</button><div id="adminRatibaList"></div>
 <h4>2. 📢 Ongeza Tangazo</h4><input id="eTangazoTitle" placeholder="Kichwa"><input id="eTangazoBody" placeholder="Maelezo"><button class="btn2" onclick="addTangazo()">+ ONGEZA TANGAZO</button><div id="adminTangazoList"></div>
 <h4>3. 📚 Ongeza Kitabu</h4><input id="eKitabuTitle" placeholder="Jina la Kitabu"><input id="eKitabuLink" placeholder="Link"><button class="btn2" onclick="addKitabu()">+ ONGEZA KITABU</button><div id="adminLibList"></div>
@@ -92,13 +90,13 @@ h4{margin:18px 0 6px 0;color:#0a2a5e;border-bottom:2px solid #facc15;padding-bot
 <button class="btn" style="margin-top:15px;background:#ef4444;color:white" onclick="resetAll()">🗑️ RUDISHA KAMA MWANZO</button></div>
 
 <div id="tMahudhurio" class="card hidden" style="border:2px solid #22c55e">
-<p class="sectionTitle">👥 Mahudhurio - CR Tu</p><p class="sub">Namba hii ni ile ile kwa simu zote leo. Inabadilika kesho.</p>
+<p class="sectionTitle">👥 Mahudhurio LIVE - CR Tu <span class="liveDot"></span></p>
+<p class="sub">Mwanafunzi akiingia kwenye simu yake, unaona hapa papo hapo bila refresh!</p>
 <div class="qrBox">
-<p style="font-weight:800;color:#0a2a5e;margin:0 0 8px 0">QR YA LEO - WAFUNZI WAI-SCAN / WAANDIKE NAMBA</p>
+<p style="font-weight:800;color:#0a2a5e;margin:0 0 8px 0">NAMBA YA LEO - WAFUNZI WAANDIKE</p>
 <img id="qrImg" src="" alt="QR Code"><div class="codeBig" id="qrCodeText">----</div>
-<p style="font-size:12px;color:#64748b;margin:0">Waambie wanafunzi waandike namba hii. Ni rahisi kuliko scan.</p>
 </div>
-<h4>✅ Waliothibitika Leo (<span id="countPresent">0</span>)</h4><div id="listPresent"></div>
+<h4>✅ Waliopo Darasani Leo LIVE (<span id="countPresent">0</span>)</h4><div id="listPresent"></div>
 <button class="btn2" style="background:#ef4444" onclick="futaMahudhurio()">🗑️ Futa Mahudhurio ya Leo</button>
 </div>
 </div>
@@ -106,6 +104,27 @@ h4{margin:18px 0 6px 0;color:#0a2a5e;border-bottom:2px solid #facc15;padding-bot
 </div>
 
 <script>
+// ========== WEKA FIREBASE CONFIG YAKO HAPA - NAKILI KUTOKA FIREBASE CONSOLE ==========
+const firebaseConfig = {
+  apiKey: "WEKA HAPA - apiKey yako",
+  authDomain: "WEKA HAPA - authDomain yako",
+  projectId: "WEKA HAPA - projectId yako",
+  storageBucket: "WEKA HAPA - storageBucket yako",
+  messagingSenderId: "WEKA HAPA - messagingSenderId yako",
+  appId: "WEKA HAPA - appId yako"
+};
+// ========== MWISHO WA KUWEKA ==========
+let db=null; let firebaseOK=false;
+try{
+  if(firebaseConfig.apiKey.includes("WEKA HAPA")){ document.getElementById('firebaseStatus').innerText="⚠️ Bado hujaweka Firebase Config - Angalia Hatua 3"; }
+  else{
+    firebase.initializeApp(firebaseConfig);
+    db=firebase.firestore();
+    firebaseOK=true;
+    document.getElementById('firebaseStatus').innerText="✅ Firebase Imeunganishwa - LIVE";
+  }
+}catch(e){ document.getElementById('firebaseStatus').innerText="❌ Firebase haikuunganishwa: "+e.message; }
+
 const DEFAULT_RATIBA={1:[{somo:"Database Lab",muda:"8:00-10:00",chumba:"Lab 2"},{somo:"English",muda:"11:00-13:00",chumba:"LH 1"}],2:[{somo:"Calculus",muda:"10:00-12:00",chumba:"LH 3"}],3:[{somo:"Networking",muda:"8:00-10:00",chumba:"Lab 1"}],4:[{somo:"System Analysis",muda:"9:00-11:00",chumba:"LH 2"}],5:[{somo:"Project",muda:"8:00-12:00",chumba:"Lab 1"}],0:[],6:[]};
 const DEFAULT_WALIMU=[{name:"Mr. Juma - Database",somo:"Database",phone:"0712345678"},{name:"HOD - BIT",somo:"Mkuu wa Idara",phone:"0711223344"}];
 const DEFAULT_VITABU=[{title:"📘 Database Notes",link:"https://www.w3schools.com/sql/"},{title:"📗 Networking Slides",link:"https://www.geeksforgeeks.org/computer-network-tutorials/"}];
@@ -114,58 +133,46 @@ const DEFAULT_EXAM="2026-12-15T08:00:00";
 function load(k,def){try{let v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch(e){return def;}}
 let RATIBA=load('SC_RATIBA',DEFAULT_RATIBA);let WALIMU=load('SC_WALIMU',DEFAULT_WALIMU);let VITABU=load('SC_VITABU',DEFAULT_VITABU);let TANGAZO=load('SC_TANGAZO',DEFAULT_TANGAZO);let EXAM_DATE_STR=localStorage.getItem('SC_EXAM')||DEFAULT_EXAM;
 let TODAY=new Date().toISOString().slice(0,10);
-// *** FIX KUBWA: CODE INATOKA KWENYE TAREHE, SIO BAHATI NASIBU - SIMU ZOTE ZINAPATA ILE ILE ***
-function getTodayCode(){
-  let d=new Date();
-  let day=d.getDate(); let month=d.getMonth()+1; let year=d.getFullYear();
-  let num = (day*137 + month*71 + (year%100)*13 + 1234) % 9000 + 1000;
-  return String(num);
-}
+function getTodayCode(){let d=new Date();let day=d.getDate();let month=d.getMonth()+1;let year=d.getFullYear();let num=(day*137+month*71+(year%100)*13+1234)%9000+1000;return String(num);}
 function renderQR(){let code=getTodayCode();document.getElementById('qrCodeText').innerText=code;document.getElementById('qrImg').src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=20&color=000000&bgcolor=FFFFFF&data="+code;}
-function getAttendance(){let a=JSON.parse(localStorage.getItem('SC_ATT')||'null');if(!a||a.date!==TODAY)return {date:TODAY,list:[]};return a;}
-function saveAttendance(a){localStorage.setItem('SC_ATT',JSON.stringify(a));renderAttendance();}
-function renderAttendance(){let a=getAttendance();document.getElementById('countPresent').innerText=a.list.length;let h="";if(a.list.length==0)h="<p style='text-align:center;color:#94a3b8'>Bado hakuna aliyefika leo</p>";else a.list.forEach(s=>{h+=`<div class="item"><b>${s.name}</b> <span style="float:right;font-size:12px">✅ ${s.time}</span><br><small>Code: ${s.code}</small></div>`});document.getElementById('listPresent').innerHTML=h;}
-function futaMahudhurio(){if(confirm("Futa mahudhurio ya leo?")){localStorage.removeItem('SC_ATT');renderAttendance();}}
-function somaPicha(input){
-  let file=input.files[0]; if(!file) return;
-  document.getElementById('qrErr').innerText="⏳ Inasoma picha...";
-  let qr = new Html5Qrcode("readerTemp");
-  // Tumia div ya muda
-  let tmp=document.createElement('div'); tmp.id="readerTemp"; tmp.style.display="none"; document.body.appendChild(tmp);
-  let qr2 = new Html5Qrcode("readerTemp");
-  qr2.scanFile(file, true).then(decoded=>{
-    let code=decoded.trim();
-    let real=getTodayCode();
-    if(code===real){ thibitishaKuingia(code,true); }
-    else { document.getElementById('qrErr').innerText="❌ Picha hii sio QR ya leo. Umescan: "+code+" - Inatakiwa: "+real; }
-    tmp.remove();
-  }).catch(e=>{
-    document.getElementById('qrErr').innerText="❌ Picha haikusomeka. Andika Namba hapo juu - ni rahisi zaidi.";
-    tmp.remove();
-  });
-  input.value="";
+// FIREBASE - MAHUDHURIO LIVE
+function listenAttendance(){
+  if(!firebaseOK) return;
+  db.collection("attendance").doc(TODAY).collection("list").orderBy("time").onSnapshot(snap=>{
+    let list=[]; snap.forEach(doc=>{ list.push(doc.data()); });
+    document.getElementById('countPresent').innerText=list.length;
+    let h=""; if(list.length==0) h="<p style='text-align:center;color:#94a3b8'>Bado hakuna aliyefika leo</p>";
+    else list.forEach(s=>{ h+=`<div class="item"><b>${s.name}</b> <span style="float:right;font-size:12px">✅ ${s.time}</span><br><small>Code: ${s.code} - LIVE</small></div>` });
+    document.getElementById('listPresent').innerHTML=h;
+  }, err=>{ console.log("Firebase err", err); });
 }
-function thibitishaKuingia(code, fromScan){
-  let n=localStorage.getItem('N'); let a=getAttendance();
-  if(a.list.find(x=>x.name.toLowerCase()===n.toLowerCase())){ checkAttendance(); return; }
+function futaMahudhurio(){
+  if(!firebaseOK){ alert("Weka Firebase Config kwanza!"); return; }
+  if(!confirm("Futa mahudhurio ya leo kwa kila mtu?")) return;
+  db.collection("attendance").doc(TODAY).collection("list").get().then(snap=>{ snap.forEach(doc=>{ doc.ref.delete(); }); alert("✅ Mahudhurio yamefutwa kwa kila mtu"); });
+}
+function thibitishaKuingia(code){
+  let n=localStorage.getItem('N');
   let time=new Date().toLocaleTimeString('sw-TZ',{hour:'2-digit',minute:'2-digit'});
-  a.list.push({name:n,time:time,code:code}); saveAttendance(a);
-  alert("✅ Karibu darasani, "+n+"! Code sahihi.");
-  checkAttendance();
+  localStorage.setItem('SC_MY_ATT', JSON.stringify({date:TODAY,name:n,time:time,code:code}));
+  if(firebaseOK){
+    db.collection("attendance").doc(TODAY).collection("list").doc(n.toLowerCase().replace(/[^a-z0-9]/g,"_")).set({name:n,time:time,code:code,timestamp:firebase.firestore.FieldValue.serverTimestamp()}).then(()=>{
+      alert("✅ Karibu darasani, "+n+"! CR anakukuona sasa LIVE.");
+      checkAttendance();
+    }).catch(e=>{ alert("❌ Hitilafu ya Firebase: "+e.message); });
+  } else {
+    alert("✅ Karibu darasani, "+n+"! (Lakini Firebase haijaunganishwa, CR hatakuona - weka config kwanza)");
+    checkAttendance();
+  }
 }
-function thibitishaQRManual(){
-  let input=document.getElementById('qrCodeInput').value.trim();
-  let real=getTodayCode();
-  document.getElementById('qrDebug').innerText="Code yako: "+input+" | Code ya leo: "+real;
-  if(input!==real){document.getElementById('qrErr').innerText="❌ Code sio sahihi! Angalia namba kubwa chini ya QR ya CR. Inatakiwa: "+real;return;}
-  thibitishaKuingia(input,false);
-}
+function getMyAttendance(){let a=JSON.parse(localStorage.getItem('SC_MY_ATT')||'null');if(!a||a.date!==TODAY)return null;return a;}
+function thibitishaQRManual(){let input=document.getElementById('qrCodeInput').value.trim();let real=getTodayCode();if(input!==real){document.getElementById('qrErr').innerText="❌ Code sio sahihi! Inatakiwa: "+real;return;}thibitishaKuingia(input);}
 function isAdmin(){let n=localStorage.getItem('N')||"";let p=localStorage.getItem('P')||"";return n.toLowerCase().includes("godfrey")&&p==="1234";}
-function checkAttendance(){if(isAdmin()){document.getElementById('checkinCard').classList.add('hidden');document.getElementById('dashboardContent').classList.remove('hidden');document.getElementById('attendanceStatus').innerText="👑 Uko kama CR - Huhitaji QR";return;}let a=getAttendance();let n=localStorage.getItem('N')||"";let found=a.list.find(x=>x.name.toLowerCase()===n.toLowerCase());if(found){document.getElementById('checkinCard').classList.add('hidden');document.getElementById('dashboardContent').classList.remove('hidden');document.getElementById('attendanceStatus').innerText="✅ Umethibitika leo - "+found.time;}else{document.getElementById('checkinCard').classList.remove('hidden');document.getElementById('dashboardContent').classList.add('hidden');}}
+function checkAttendance(){if(isAdmin()){document.getElementById('checkinCard').classList.add('hidden');document.getElementById('dashboardContent').classList.remove('hidden');document.getElementById('attendanceStatus').innerText="👑 Uko kama CR - Huhitaji QR";return;}let my=getMyAttendance();if(my){document.getElementById('checkinCard').classList.add('hidden');document.getElementById('dashboardContent').classList.remove('hidden');document.getElementById('attendanceStatus').innerText="✅ Umethibitika leo - "+my.time;}else{document.getElementById('checkinCard').classList.remove('hidden');document.getElementById('dashboardContent').classList.add('hidden');}}
 function saveAll(){localStorage.setItem('SC_RATIBA',JSON.stringify(RATIBA));localStorage.setItem('SC_WALIMU',JSON.stringify(WALIMU));localStorage.setItem('SC_VITABU',JSON.stringify(VITABU));localStorage.setItem('SC_TANGAZO',JSON.stringify(TANGAZO));localStorage.setItem('SC_EXAM',EXAM_DATE_STR);renderAll();renderAdmin();}
 let SIKU=["Jumapili","Jumatatu","Jumanne","Jumatano","Alhamisi","Ijumaa","Jumamosi"];
 function ingia(){let n=document.getElementById('name').value.trim();let p=document.getElementById('pass').value.trim();if(n.length<2){document.getElementById('err').innerText="Weka jina kwanza";return;}if(p!=="0000"&&!(n.toLowerCase().includes("godfrey")&&p==="1234")){document.getElementById('err').innerText="❌ Password sio sahihi!";return;}localStorage.setItem('N',n);localStorage.setItem('P',p);openMain();}
-function openMain(){let n=localStorage.getItem('N');let p=localStorage.getItem('P');if(!n)return;document.getElementById('login').classList.add('hidden');document.getElementById('main').classList.remove('hidden');document.getElementById('hi').innerText="Habari, "+n+"!";if(isAdmin()){document.getElementById('b5').classList.remove('hidden');document.getElementById('b6').classList.remove('hidden');}document.getElementById('leo').innerText="Leo ni "+SIKU[new Date().getDay()];let EXAM=new Date(EXAM_DATE_STR);let days=Math.ceil((EXAM-new Date())/86400000);if(days<0)days=0;document.getElementById('count').innerText=days;renderAll();renderAdmin();renderQR();renderAttendance();checkAttendance();}
+function openMain(){let n=localStorage.getItem('N');let p=localStorage.getItem('P');if(!n)return;document.getElementById('login').classList.add('hidden');document.getElementById('main').classList.remove('hidden');document.getElementById('hi').innerText="Habari, "+n+"!";if(isAdmin()){document.getElementById('b5').classList.remove('hidden');document.getElementById('b6').classList.remove('hidden');}document.getElementById('leo').innerText="Leo ni "+SIKU[new Date().getDay()];let EXAM=new Date(EXAM_DATE_STR);let days=Math.ceil((EXAM-new Date())/86400000);if(days<0)days=0;document.getElementById('count').innerText=days;renderAll();renderAdmin();renderQR();listenAttendance();checkAttendance();}
 function renderAll(){let day=new Date().getDay();let list=RATIBA[day]||[];let h="";if(list.length==0)h="<p style='text-align:center;color:#94a3b8'>😴 Hakuna vipindi leo</p>";else list.forEach(r=>{h+=`<div class="item"><b>${r.somo}</b><br><small>⏰ ${r.muda} | 📍 ${r.chumba}</small></div>`});document.getElementById('listRatiba').innerHTML=h;document.getElementById('statVipindi').innerText=list.length;document.getElementById('statTangazo').innerText=TANGAZO.length;document.getElementById('statWalimu').innerText=WALIMU.length;let ht="";TANGAZO.forEach(t=>{ht+=`<div class="item" style="border-left-color:#dc2626;background:#fef2f2"><b>${t.title}</b><br><small>${t.body}</small></div>`});document.getElementById('listTangazo').innerHTML=ht;let hl="";VITABU.forEach(v=>{hl+=`<div class="item" style="border-left-color:#7c3aed;background:#f5f3ff"><b>${v.title}</b> <button onclick="window.open('${v.link}')" style="float:right;background:#7c3aed;color:white;border:none;padding:6px 12px;border-radius:8px">Soma</button></div>`});document.getElementById('listLib').innerHTML=hl;let hw="";WALIMU.forEach(w=>{hw+=`<div class="item" style="border-left-color:#0ea5e9;background:#f0f9ff"><b>${w.name}</b> - ${w.somo}<br><small>📞 ${w.phone}</small> <a href="tel:${w.phone}" style="background:#22c55e;color:white;padding:6px 12px;border-radius:8px;text-decoration:none;float:right">Piga</a></div>`});document.getElementById('listWalimu').innerHTML=hw;}
 function renderAdmin(){let hr="";Object.keys(RATIBA).forEach(d=>{RATIBA[d].forEach((r,i)=>{hr+=`<div class="item" style="font-size:12px">${SIKU[d]} - ${r.somo} (${r.muda}) <button class="btnDel" onclick="delRatiba(${d},${i})">Futa</button></div>`;});});document.getElementById('adminRatibaList').innerHTML=hr;let ht="";TANGAZO.forEach((t,i)=>{ht+=`<div class="item" style="font-size:12px">${t.title} <button class="btnDel" onclick="delTangazo(${i})">Futa</button></div>`;});document.getElementById('adminTangazoList').innerHTML=ht;let hl="";VITABU.forEach((v,i)=>{hl+=`<div class="item" style="font-size:12px">${v.title} <button class="btnDel" onclick="delKitabu(${i})">Futa</button></div>`;});document.getElementById('adminLibList').innerHTML=hl;let hw="";WALIMU.forEach((w,i)=>{hw+=`<div class="item" style="font-size:12px">${w.name} <button class="btnDel" onclick="delMwalimu(${i})">Futa</button></div>`;});document.getElementById('adminWalimuList').innerHTML=hw;}
 function addRatiba(){let d=document.getElementById('eSiku').value;let s=document.getElementById('eSomo').value.trim();let m=document.getElementById('eMuda').value.trim();let c=document.getElementById('eChumba').value.trim();if(!s||!m){alert("Jaza somo na muda");return;}if(!RATIBA[d])RATIBA[d]=[];RATIBA[d].push({somo:s,muda:m,chumba:c||"Darasa"});document.getElementById('eSomo').value="";document.getElementById('eMuda').value="";document.getElementById('eChumba').value="";saveAll();alert("✅ Kipindi kimeongezwa!");}
