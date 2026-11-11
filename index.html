@@ -3,41 +3,84 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mahudhurio - Smart Class</title>
+<title>Smart Class</title>
 <style>
-body{font-family:Arial; padding:15px; background:#f2f2f2;}
-input, select{width:100%; padding:12px; margin:5px 0; border-radius:8px; border:1px solid #ccc; box-sizing:border-box;}
-button{width:100%; padding:14px; border:none; border-radius:8px; background:#2563eb; color:white; font-weight:bold; font-size:16px;}
-button:disabled{background:#999;}
-table{width:100%; background:white; border-collapse:collapse; margin-top:15px;}
-th,td{padding:8px; border:1px solid #ddd; font-size:13px;}
-#ujumbe{padding:12px; border-radius:8px; margin-top:10px; display:none; font-weight:bold; text-align:center;}
+body{font-family:Arial; padding:15px; background:#f2f2f2; margin:0;}
+.card{background:white; padding:15px; border-radius:12px; margin-bottom:12px; box-shadow:0 2px 5px #ddd;}
+input, select{width:100%; padding:12px; margin:6px 0; border-radius:8px; border:1px solid #ccc; box-sizing:border-box;}
+button{width:100%; padding:14px; border:none; border-radius:8px; background:#2563eb; color:white; font-weight:bold; font-size:16px; margin-top:6px;}
+button.green{background:#16a34a;} button.red{background:#dc2626;} button.gray{background:#64748b;}
+table{width:100%; background:white; border-collapse:collapse;}
+th,td{padding:8px; border:1px solid #ddd; font-size:13px; text-align:left;}
+#ujumbe{padding:12px; border-radius:8px; margin:10px 0; display:none; font-weight:bold; text-align:center; color:white;}
+.tab{display:flex; gap:5px;} .tab button{background:#e2e8f0; color:#000; padding:10px; font-size:13px;}
+.tab button.active{background:#2563eb; color:#fff;}
+.hidden{display:none;}
+.top{display:flex; justify-content:space-between; align-items:center;}
 </style>
 </head>
 <body>
-<h2>Mahudhurio - Smart Class</h2>
-<input type="text" id="jina" placeholder="Jina lako kamili">
-<input type="text" id="namba" placeholder="Namba mf: IT/01">
-<select id="somo">
-  <option>Database</option>
-  <option>Networking</option>
-  <option>Web Development</option>
-  <option>Programming</option>
-</select>
-<input type="date" id="tarehe">
-<div id="ujumbe"></div>
-<button id="btnIngia" onclick="ingia()">NIMESHAFIKA ✅</button>
 
-<h3>Walioshaingia Leo (Live) - CR anaona hapa</h3>
-<p id="hesabu">Inapakia...</p>
-<table>
-<thead><tr><th>Jina</th><th>Namba</th><th>Somo</th><th>Muda</th></tr></thead>
-<tbody id="orodha"></tbody>
-</table>
+<!-- ========== 1. LOGIN ========== -->
+<div id="pageLogin" class="card">
+<h2>🎓 Smart Class - Login</h2>
+<p>CR: <b>cr / cr123</b><br>Mwanafunzi: <b>jina lako / 1234</b></p>
+<select id="role"><option value="student">Mimi ni Mwanafunzi</option><option value="cr">Mimi ni CR</option></select>
+<input id="loginJina" placeholder="Jina lako / Username">
+<input id="loginPass" type="password" placeholder="Password">
+<div id="ujumbe"></div>
+<button onclick="login()">INGIA ➡️</button>
+<p style="font-size:12px; color:#666;">Mwanafunzi: Andika jina lolote, password ni <b>1234</b><br>CR: Username <b>cr</b>, Password <b>cr123</b></p>
+</div>
+
+<!-- ========== 2. MWANAFUNZI: ANDIKA NAMBA KWANZA ========== -->
+<div id="pageNamba" class="card hidden">
+<h2>Karibu <span id="welcomeName"></span></h2>
+<p>Hatua 1: Andika Namba yako ya Usajili</p>
+<input id="nambaKwanza" placeholder="Mf: ITT06101">
+<button onclick="endaFomu()">ENDELEA ➡️</button>
+<button class="gray" onclick="logout()">Toka</button>
+</div>
+
+<!-- ========== 3. MWANAFUNZI: FOMU YA MAHUDHURIO ========== -->
+<div id="pageFomu" class="card hidden">
+<h2>Jaza Mahudhurio</h2>
+<input id="jina" placeholder="Jina lako kamili">
+<input id="namba" placeholder="Namba">
+<select id="somo"><option>Database</option><option>Networking</option><option>Web Development</option><option>Programming</option></select>
+<input type="date" id="tarehe">
+<p style="font-size:13px;">Muda wa kuingia utajijaza wenyewe ukibonyeza hapa chini.</p>
+<button onclick="ingia()">NIMESHAFIKA ✅</button>
+<button class="gray" onclick="logout()">Toka</button>
+</div>
+
+<!-- ========== 4. DASHBOARD YA MWANAFUNZI ========== -->
+<div id="pageStudentDash" class="hidden">
+<div class="card top"><h2>👋 Karibu <span class="myName"></span></h2><button style="width:auto; padding:8px 12px;" class="red" onclick="logout()">Toka</button></div>
+<div class="card"><div class="tab"><button class="active" onclick="showTab('ratibaS',this)">📅 Ratiba</button><button onclick="showTab('tangazoS',this)">📢 Tangazo</button><button onclick="showTab('libraryS',this)">📚 Library</button></div>
+<div id="ratibaS"><h3>Ratiba ya Leo</h3><p><b>08:00 - 10:00</b> Database - Lab 2<br><b>10:30 - 12:30</b> Programming - Lab 1<br><b>14:00 - 16:00</b> Networking - Darasa 3</p></div>
+<div id="tangazoS" class="hidden"><h3>Tangazo</h3><p>📢 Kesho hakuna somo la asubuhi. Assignment ya Database iwasilishwe Ijumaa.</p></div>
+<div id="libraryS" class="hidden"><h3>Library</h3><p>📕 Database Notes - <a href="#">Soma hapa</a><br>📗 Programming PDF - <a href="#">Pakua</a><br>📘 Networking Slides - <a href="#">Soma hapa</a></p></div>
+</div>
+<p style="text-align:center; font-size:13px; color:green;">✅ Umerekodiwa leo. CR pekee ndiye anaona orodha.</p>
+</div>
+
+<!-- ========== 5. DASHBOARD YA CR ========== -->
+<div id="pageCR" class="hidden">
+<div class="card top"><h2>👑 Dashboard ya CR</h2><button style="width:auto;" class="red" onclick="logout()">Toka</button></div>
+<div class="card"><h3>Walioshaingia Darasani (Live) - CR Pekee</h3><p id="hesabu">Inapakia...</p>
+<select id="filterSomo" onchange="loadCR()"><option value="">Somo Zote</option><option>Database</option><option>Networking</option><option>Web Development</option><option>Programming</option></select>
+<table><thead><tr><th>Jina</th><th>Namba</th><th>Somo</th><th>Muda</th><th></th></tr></thead><tbody id="orodha"></tbody></table>
+<button class="green" onclick="downloadExcel()">⬇ Pakua Excel</button></div>
+<div class="card"><div class="tab"><button class="active" onclick="showTab('ratibaC',this)">📅 Ratiba</button><button onclick="showTab('tangazoC',this)">📢 Tangazo</button><button onclick="showTab('libraryC',this)">📚 Library</button></div>
+<div id="ratibaC"><p><b>08:00</b> Database<br><b>10:30</b> Programming<br><b>14:00</b> Networking</p></div>
+<div id="tangazoC" class="hidden"><p>📢 Kesho hakuna somo la asubuhi. Assignment Ijumaa.</p></div>
+<div id="libraryC" class="hidden"><p>📕 Notes zote ziko hapa kwa wanafunzi.</p></div></div>
+</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDIKEsqM75pt5idkqIAjVzOy_sR5E-0I3A",
@@ -48,63 +91,77 @@ const firebaseConfig = {
   appId: "1:951101986882:web:24f6b609e3113b8f4675db",
   measurementId: "G-KF8L9NTLEP"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+let myRole = "student", myName = "", myNamba = "";
 document.getElementById('tarehe').valueAsDate = new Date();
 
-function ujumbe(text, rangi){
-  let u = document.getElementById('ujumbe');
-  u.style.display='block'; u.style.background=rangi; u.style.color='white'; u.innerText=text;
-  setTimeout(()=> u.style.display='none', 4000);
+function show(id){ ["pageLogin","pageNamba","pageFomu","pageStudentDash","pageCR"].forEach(p=>document.getElementById(p).classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
+function ujumbe(t,c){ let u=document.getElementById('ujumbe'); u.style.display='block'; u.style.background=c; u.innerText=t; setTimeout(()=>u.style.display='none',4000); }
+window.showTab = function(id,btn){ let parent = btn.parentElement.parentElement; parent.querySelectorAll('div[id]').forEach(d=>d.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); parent.querySelectorAll('.tab button').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
+
+window.login = function(){
+  let jina = document.getElementById('loginJina').value.trim();
+  let pass = document.getElementById('loginPass').value.trim();
+  let role = document.getElementById('role').value;
+  if(!jina || !pass){ ujumbe('Weka Jina na Password','orange'); return; }
+  if(role==="cr"){
+    if(jina.toLowerCase()==="cr" && pass==="cr123"){ myRole="cr"; myName="CR"; show('pageCR'); loadCR(); }
+    else ujumbe('❌ Password ya CR si sahihi','red');
+  } else {
+    if(pass==="1234"){ myRole="student"; myName=jina; document.getElementById('welcomeName').innerText=jina; document.querySelectorAll('.myName').forEach(e=>e.innerText=jina); show('pageNamba'); }
+    else ujumbe('❌ Password ya mwanafunzi ni 1234','red');
+  }
+}
+
+window.endaFomu = function(){
+  let n = document.getElementById('nambaKwanza').value.trim().toUpperCase();
+  if(!n){ alert('Andika Namba kwanza'); return; }
+  myNamba = n;
+  document.getElementById('namba').value = n;
+  document.getElementById('jina').value = myName;
+  show('pageFomu');
 }
 
 window.ingia = async function(){
-  let btn = document.getElementById('btnIngia');
-  btn.disabled = true;
-  btn.innerText = 'Inatuma...';
   try{
     let jina = document.getElementById('jina').value.trim();
     let namba = document.getElementById('namba').value.trim().toUpperCase();
     let somo = document.getElementById('somo').value;
     let tarehe = document.getElementById('tarehe').value;
-    if(!jina || !namba || !tarehe){ ujumbe('⚠️ Weka Jina, Namba na Tarehe','orange'); return; }
-
-    const snap = await getDocs(collection(db, "mahudhurio"));
-    let tayari = false;
-    snap.forEach(doc => {
-      let d = doc.data();
-      if(d.namba === namba && d.somo === somo && d.tarehe === tarehe) tayari = true;
-    });
-    if(tayari){ ujumbe('⛔ ' + jina + ' TAYARI UMEINGIA LEO!','red'); return; }
-
-    await addDoc(collection(db, "mahudhurio"), {
-      jina, namba, somo, tarehe, muda: new Date().toLocaleTimeString(), created: Date.now()
-    });
-    ujumbe('✅ Karibu ' + jina + ', umehesabiwa!','green');
-    document.getElementById('jina').value='';
-    document.getElementById('namba').value='';
-  }catch(e){
-    ujumbe('❌ Hitilafu: ' + e.message,'red');
-    console.log(e);
-  }finally{
-    btn.disabled = false;
-    btn.innerText = 'NIMESHAFIKA ✅';
-  }
+    if(!jina || !namba){ alert('Weka Jina na Namba'); return; }
+    const snap = await getDocs(collection(db,"mahudhurio"));
+    let tayari=false; snap.forEach(d=>{ let x=d.data(); if(x.namba===namba && x.somo===somo && x.tarehe===tarehe) tayari=true; });
+    if(tayari){ alert('⛔ Tayari umeingia leo!'); show('pageStudentDash'); return; }
+    await addDoc(collection(db,"mahudhurio"),{jina,namba,somo,tarehe,muda:new Date().toLocaleTimeString(),created:Date.now()});
+    alert('✅ Karibu '+jina+', umehesabiwa! Muda: '+new Date().toLocaleTimeString());
+    show('pageStudentDash');
+  }catch(e){ alert('Hitilafu: '+e.message); }
 }
 
-onSnapshot(collection(db, "mahudhurio"), (snap)=>{
-  let rows = [];
-  snap.forEach(doc => rows.push(doc.data()));
-  rows.sort((a,b)=> b.created - a.created);
-  let tbody = document.getElementById('orodha');
-  tbody.innerHTML = '';
-  rows.forEach(d => {
-    tbody.innerHTML += `<tr><td>${d.jina}</td><td>${d.namba}</td><td>${d.somo}</td><td>${d.muda}</td></tr>`;
-  });
-  document.getElementById('hesabu').innerText = 'Jumla walioingia: ' + rows.length;
+window.logout = function(){ show('pageLogin'); document.getElementById('loginPass').value=''; }
+
+// CR ANAONA LIVE
+let allDocs=[];
+onSnapshot(collection(db,"mahudhurio"), (snap)=>{
+  allDocs=[]; snap.forEach(d=> allDocs.push({id:d.id, ...d.data()}));
+  allDocs.sort((a,b)=>b.created-a.created);
+  if(myRole==="cr") loadCR();
 });
+window.loadCR = function(){
+  let f = document.getElementById('filterSomo').value;
+  let list = f ? allDocs.filter(d=>d.somo===f) : allDocs;
+  let tb=document.getElementById('orodha'); tb.innerHTML='';
+  list.forEach(d=>{ tb.innerHTML+=`<tr><td>${d.jina}</td><td>${d.namba}</td><td>${d.somo}</td><td>${d.muda}</td><td><button style="padding:5px; width:auto; font-size:12px;" class="red" onclick="futa('${d.id}')">X</button></td></tr>`; });
+  document.getElementById('hesabu').innerText='Jumla: '+list.length;
+}
+window.futa = async function(id){ if(confirm('Futa huyu?')) await deleteDoc(doc(db,"mahudhurio",id)); }
+window.downloadExcel = function(){
+  let csv="Jina,Namba,Somo,Tarehe,Muda\n";
+  allDocs.forEach(d=> csv+=`${d.jina},${d.namba},${d.somo},${d.tarehe},${d.muda}\n`);
+  let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='mahudhurio.csv'; a.click();
+}
 </script>
 </body>
 </html>
