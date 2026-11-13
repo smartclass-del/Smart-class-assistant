@@ -39,11 +39,11 @@
 
   <div class="card" id="loginCard">
     <h2 style="margin:0">👋 Welcome - Login</h2>
-    <p style="color:#666">Student: Name + 4-digit Code. Example: Fadhili / 0001<br>CR Level 4: Code = <b>IT/4</b> | CR Level 5: <b>IT/5</b> | CR Level 6: <b>IT/6</b></p>
+    <p style="color:#666">Student: Name + 4-digit Code. Example: Fadhili / 0001<br>CR: Use your own number. Example: John / <b>IT/4-01</b> | Sara / <b>IT/4-02</b> | David / <b>IT/5-01</b></p>
     <label>Your Name</label>
     <input id="loginName" placeholder="e.g. Fadhili">
     <label>Your Code</label>
-    <input id="loginCode" placeholder="e.g. 0001 or IT/5" maxlength="10">
+    <input id="loginCode" placeholder="e.g. 0001 or IT/4-01" maxlength="10">
     <label>Choose Your Level</label>
     <select id="loginLevel">
       <option value="Level 4">Level 4</option>
@@ -86,6 +86,7 @@
       </div>
       <div style="background:white;color:black;padding:12px;border-radius:14px;margin-top:12px">
         <h3 style="margin:0">📋 All Students Attendance - CR View</h3>
+        <p style="font-size:13px;color:#666">If a student signed but is NOT in class, press ❌ Remove</p>
         <div id="crAttendance"></div>
         <p id="crAttendanceCount"></p>
         <button class="btn btn-green" onclick="exportExcel()">⬇ Download Excel</button>
@@ -131,11 +132,18 @@
 
 <script>
 const EXAM_DATE = "2026-12-15";
-const CR_PASSWORDS = { "Level 4": "IT/4", "Level 5": "IT/5", "Level 6": "IT/6" };
+// EDITED: Kila CR ana namba yake mwenyewe - Badilisha majina hapa kuwa ya ma-CR wenu halisi
+const CR_USERS = [
+  { name: "John",  level: "Level 4", code: "IT/4-01" },
+  { name: "Sara",  level: "Level 4", code: "IT/4-02" },
+  { name: "David", level: "Level 5", code: "IT/5-01" },
+  { name: "Grace", level: "Level 5", code: "IT/5-02" },
+  { name: "Peter", level: "Level 6", code: "IT/6-01" },
+  { name: "Anna",  level: "Level 6", code: "IT/6-02" },
+];
 
 let users = JSON.parse(localStorage.getItem("sc_users") || "[]");
 
-// Default data per Level - kila Level ina yake
 function defaultTimetable(){
   return {
     "Monday":[{time:"08:00",subject:"Database",room:"Room 5",teacher:"Mr. John"}],
@@ -196,7 +204,6 @@ function checkDailyReset(){
 }
 checkDailyReset();
 
-// === FIXED: doRegister sasa ina level ===
 function doRegister(){
   const name = document.getElementById("loginName").value.trim();
   let code = document.getElementById("loginCode").value.trim();
@@ -204,7 +211,7 @@ function doRegister(){
   const err = document.getElementById("loginError");
   if(!name || !code){ err.textContent = "Please enter Name and Code."; return; }
   if(!/^\d{4}$/.test(code)){ err.textContent = "Code must be exactly 4 digits, e.g. 0001"; return; }
-  if(Object.values(CR_PASSWORDS).includes(code)){ err.textContent = "This code is reserved for CR only."; return; }
+  if(CR_USERS.find(c => c.code === code)){ err.textContent = "This code is reserved for CR only."; return; }
   if(users.find(u=>u.code === code && u.level === level)){
     err.textContent = "Code " + code + " already used in " + level + "! Please use " + getNextCode();
     return;
@@ -219,15 +226,16 @@ function doRegister(){
   updateNextHint();
 }
 
-// === FIXED: doLogin - hakuna code ya zamani iliyobaki ===
+// EDITED: CR login sasa ni Jina + Namba yake mwenyewe + Level
 function doLogin(){
   const name = document.getElementById("loginName").value.trim();
   const code = document.getElementById("loginCode").value.trim();
   const level = document.getElementById("loginLevel").value;
   const err = document.getElementById("loginError");
   if(!name || !code){ err.textContent = "Enter Name and Code."; return; }
-  if(code === CR_PASSWORDS[level]){
-    currentUser = {name: name, code: code, role: "CR", level: level};
+  const crFound = CR_USERS.find(c => c.name.toLowerCase() === name.toLowerCase() && c.code === code && c.level === level);
+  if(crFound){
+    currentUser = {name: crFound.name, code: crFound.code, role: "CR", level: crFound.level};
     localStorage.setItem("sc_current", JSON.stringify(currentUser));
     enterApp(); return;
   }
@@ -245,7 +253,7 @@ function enterApp(){
   document.getElementById("roleLabel").textContent = currentUser.role === "CR" ? "CR - CLASS REP" : "STUDENT";
   if(currentUser.role === "CR"){
     document.getElementById("crPanel").classList.remove("hidden");
-    document.getElementById("crLevelInfo").textContent = "You are CR for " + currentUser.level + " - You can only add for " + currentUser.level;
+    document.getElementById("crLevelInfo").textContent = "You are CR for " + currentUser.level + " - Your code: " + currentUser.code + " - You can only add for " + currentUser.level;
   }
   document.getElementById("dateNow").textContent = new Date().toLocaleDateString("en-GB",{weekday:'long',year:'numeric',month:'long',day:'numeric'}) + " | " + currentUser.level + " | Auto update at 6:00 AM";
   updateCountdown(); renderTimetable("auto"); renderAnnouncements(); renderBooks(); renderMyAttendance(); renderCRAttendance();
@@ -294,13 +302,37 @@ function renderMyAttendance(){
   document.getElementById("myAttendanceStatus").textContent = todayMine ? "✅ You are PRESENT today at " + todayMine.time : "❌ You have NOT signed today yet.";
   document.getElementById("myAttendanceList").innerHTML = mine.length ? mine.map(m=>`<div>✅ ${m.date} - ${m.time}</div>`).join("") : "No attendance yet.";
 }
+// EDITED: CR sasa ana kitufe cha kumtoa mtu
 function renderCRAttendance(){
   const today = new Date().toDateString();
   const todays = attendance.filter(a=>a.date===today && a.level===myLevel());
   const el = document.getElementById("crAttendance");
   if(!el) return;
-  el.innerHTML = todays.length ? todays.map(a=>`<div>✅ ${a.name} (${a.code}) - ${a.time}</div>`).join("") : "No one has signed today yet.";
+  if(todays.length===0){
+    el.innerHTML = "No one has signed today yet.";
+  } else {
+    el.innerHTML = todays.map((a) => {
+      const realIndex = attendance.findIndex(x => x.name===a.name && x.date===a.date && x.level===a.level && x.time===a.time);
+      return `<div style="display:flex;justify-content:space-between;align-items:center;border:1px solid #eee;padding:8px;border-radius:10px;margin-bottom:6px;background:#f9faff">
+        <span>✅ ${a.name} (${a.code}) - ${a.time}</span>
+        <button onclick="removeAttendance(${realIndex})" style="background:#ff5e62;color:white;border:none;padding:6px 10px;border-radius:8px;cursor:pointer;font-weight:700">❌ Remove</button>
+      </div>`;
+    }).join("");
+  }
   document.getElementById("crAttendanceCount").textContent = "Present today in " + myLevel() + ": " + todays.length;
+}
+// EDITED: Function mpya ya kumtoa mtu
+function removeAttendance(index){
+  const person = attendance[index];
+  if(!person) return;
+  if(!confirm("Remove " + person.name + "? He signed but is NOT in class?")){
+    return;
+  }
+  attendance.splice(index, 1);
+  saveAll();
+  renderCRAttendance();
+  renderMyAttendance();
+  alert(person.name + " removed. He is now marked ABSENT.");
 }
 function exportExcel(){
   const today = new Date().toDateString();
