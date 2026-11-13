@@ -15,7 +15,6 @@
   .grad-blue{background:linear-gradient(135deg,#1a73e8,#00c6ff);color:white;text-align:center}
   .grad-purple{background:linear-gradient(135deg,#7b2ff7,#ff2e9a);color:white}
   .grad-green{background:linear-gradient(135deg,#11998e,#38ef7d);color:white}
-  .grad-orange{background:linear-gradient(135deg,#ff9966,#ff5e62);color:white}
   .count-num{font-size:48px;font-weight:900;margin:5px 0}
   .btn{border:none;padding:11px 16px;border-radius:12px;cursor:pointer;font-weight:700;color:white;background:linear-gradient(135deg,#667eea,#764ba2);margin:5px 5px 0 0}
   .btn-green{background:linear-gradient(135deg,#11998e,#38ef7d)}
@@ -34,28 +33,31 @@
 <div class="container">
   <div class="top">
     <h1>🎓 SMART CLASS ASSISTANT</h1>
-    <p>Level 5 IT • Smart • Daily Auto Update at 6:00 AM</p>
+    <p>Level 4 / 5 / 6 IT • Smart • Daily Auto Update at 6:00 AM</p>
     <div id="dateNow" style="background:rgba(255,255,255,.2);padding:8px;border-radius:12px;display:inline-block"></div>
   </div>
 
-  <!-- LOGIN -->
   <div class="card" id="loginCard">
     <h2 style="margin:0">👋 Welcome - Login</h2>
-    <p style="color:#666">Student: Use your Name + 4-digit Code. Example: Fadhili / 0001<br>CR: Name = <b>CR</b> , Code = <b>0000</b></p>
+    <p style="color:#666">Student: Name + 4-digit Code. Example: Fadhili / 0001<br>CR Level 4: Code = <b>IT/4</b> | CR Level 5: <b>IT/5</b> | CR Level 6: <b>IT/6</b></p>
     <label>Your Name</label>
     <input id="loginName" placeholder="e.g. Fadhili">
-    <label>Your 4-Digit Code</label>
-    <input id="loginCode" placeholder="e.g. 0001" maxlength="4" inputmode="numeric">
+    <label>Your Code</label>
+    <input id="loginCode" placeholder="e.g. 0001 or IT/5" maxlength="10">
+    <label>Choose Your Level</label>
+    <select id="loginLevel">
+      <option value="Level 4">Level 4</option>
+      <option value="Level 5" selected>Level 5</option>
+      <option value="Level 6">Level 6</option>
+    </select>
     <p id="nextCodeHint" style="color:#1a73e8;font-weight:700"></p>
     <p id="loginError" style="color:red;font-weight:700"></p>
     <button class="btn" onclick="doLogin()">Login →</button>
     <button class="btn btn-green" onclick="doRegister()">Create My Account</button>
-    <p style="font-size:13px;color:#777">Rule: One code can be used by ONE student only. 0001 cannot be repeated. Next student uses 0002, 0003...</p>
+    <p style="font-size:13px;color:#777">Rule: One code can be used by ONE student only in same Level. 0001 cannot be repeated.</p>
   </div>
 
-  <!-- MAIN APP -->
   <div id="app" class="hidden">
-
     <div class="card grad-blue">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div><b id="welcomeName">Hello</b><br><span id="roleLabel" class="pill" style="background:white">STUDENT</span></div>
@@ -67,24 +69,21 @@
       <p id="countDate" style="font-size:12px;opacity:.9"></p>
     </div>
 
-    <!-- CR PANEL - ONLY CR SEES THIS -->
     <div class="card grad-purple hidden" id="crPanel">
       <h2 style="margin:0">👑 CR CONTROL PANEL - You Can Add Anything</h2>
-      <p>Only CR sees this. Students cannot add.</p>
+      <p id="crLevelInfo">Only CR sees this. Students cannot add.</p>
       <div class="flex">
         <button class="btn" style="background:white;color:#7b2ff7" onclick="showCrForm('timetable')">+ Add Timetable</button>
         <button class="btn" style="background:white;color:#7b2ff7" onclick="showCrForm('subject')">+ Add Subject</button>
         <button class="btn" style="background:white;color:#7b2ff7" onclick="showCrForm('announcement')">+ Add Announcement</button>
         <button class="btn" style="background:white;color:#7b2ff7" onclick="showCrForm('book')">+ Add Book</button>
       </div>
-
       <div id="crForm" class="hidden" style="background:white;color:black;padding:15px;border-radius:14px;margin-top:12px">
         <h3 id="crFormTitle">Add</h3>
         <div id="crFormFields"></div>
         <button class="btn btn-green" onclick="saveCrData()">Save</button>
         <button class="btn btn-red" onclick="document.getElementById('crForm').classList.add('hidden')">Cancel</button>
       </div>
-
       <div style="background:white;color:black;padding:12px;border-radius:14px;margin-top:12px">
         <h3 style="margin:0">📋 All Students Attendance - CR View</h3>
         <div id="crAttendance"></div>
@@ -93,7 +92,6 @@
       </div>
     </div>
 
-    <!-- TODAY TIMETABLE -->
     <div class="card">
       <h2 style="margin:0">📅 Today's Timetable - <span id="todayName"></span></h2>
       <p style="color:#666;font-size:13px">Auto changes every day at 6:00 AM. Sorted by time.</p>
@@ -111,13 +109,11 @@
       </select>
     </div>
 
-    <!-- ANNOUNCEMENT OF THE DAY -->
     <div class="card">
       <h2 style="margin:0">📢 Today's Announcement</h2>
       <div id="announcementList"></div>
     </div>
 
-    <!-- ATTENDANCE - STUDENT SIGNS -->
     <div class="card grad-green">
       <h2 style="margin:0">✅ Attendance - Sign If You Are In Class</h2>
       <p>Tap once. CR will see you immediately.</p>
@@ -126,42 +122,44 @@
       <div id="myAttendanceList" style="margin-top:10px;background:white;color:black;padding:10px;border-radius:12px"></div>
     </div>
 
-    <!-- LIBRARY -->
     <div class="card">
       <h2 style="margin:0">📚 E-Library</h2>
       <div id="bookList"></div>
     </div>
-
   </div>
 </div>
 
 <script>
-// ============ CONFIG ============
-const EXAM_DATE = "2026-12-15"; // CR can change in code: e.g. "2026-11-20"
-const CR_NAME = "CR";
-const CR_CODE = "0000";
+const EXAM_DATE = "2026-12-15";
+const CR_PASSWORDS = { "Level 4": "IT/4", "Level 5": "IT/5", "Level 6": "IT/6" };
 
-// ============ STORAGE ============
 let users = JSON.parse(localStorage.getItem("sc_users") || "[]");
-let timetables = JSON.parse(localStorage.getItem("sc_timetables") || JSON.stringify({
-  "Monday":[{time:"08:00",subject:"Database",room:"Room 5",teacher:"Mr. John"}],
-  "Tuesday":[{time:"08:00",subject:"Database",room:"Room 5",teacher:"Mr. John"},{time:"11:00",subject:"System Analysis",room:"Room 3",teacher:"Madam Sara"}],
-  "Wednesday":[{time:"09:00",subject:"Programming",room:"Lab 1",teacher:"Mr. David"}],
-  "Thursday":[{time:"08:00",subject:"Networking",room:"Room 5",teacher:"Mr. Peter"},{time:"14:30",subject:"Entrepreneurship",room:"Room 3",teacher:"Madam Anna"}],
-  "Friday":[{time:"08:30",subject:"Web Development",room:"Lab 2",teacher:"Madam Anna"}],
-  "Saturday":[],"Sunday":[]
-}));
-let announcements = JSON.parse(localStorage.getItem("sc_announcements") || JSON.stringify([
-  {day:"Monday",text:"Welcome to new week! Database test on Friday."},
-  {day:"Tuesday",text:"Bring your laptop tomorrow for Practical."},
-  {day:"Wednesday",text:"Library books must be returned today."},
-  {day:"Thursday",text:"Project group meeting at 14:00."},
-  {day:"Friday",text:"No class after 12:00. Enjoy weekend."}
-]));
-let books = JSON.parse(localStorage.getItem("sc_books") || JSON.stringify([
-  {title:"Database Notes PDF",link:"#"},
-  {title:"Past Paper 2024",link:"#"}
-]));
+
+// Default data per Level - kila Level ina yake
+function defaultTimetable(){
+  return {
+    "Monday":[{time:"08:00",subject:"Database",room:"Room 5",teacher:"Mr. John"}],
+    "Tuesday":[{time:"08:00",subject:"Database",room:"Room 5",teacher:"Mr. John"},{time:"11:00",subject:"System Analysis",room:"Room 3",teacher:"Madam Sara"}],
+    "Wednesday":[{time:"09:00",subject:"Programming",room:"Lab 1",teacher:"Mr. David"}],
+    "Thursday":[{time:"08:00",subject:"Networking",room:"Room 5",teacher:"Mr. Peter"}],
+    "Friday":[{time:"08:30",subject:"Web Development",room:"Lab 2",teacher:"Madam Anna"}],
+    "Saturday":[],"Sunday":[]
+  };
+}
+let timetables = JSON.parse(localStorage.getItem("sc_timetables") || "null");
+if(!timetables || !timetables["Level 5"]){
+  timetables = { "Level 4": defaultTimetable(), "Level 5": defaultTimetable(), "Level 6": defaultTimetable() };
+}
+let announcements = JSON.parse(localStorage.getItem("sc_announcements") || "null");
+if(!announcements || !announcements["Level 5"]){
+  let def = [{day:"Monday",text:"Welcome to new week!"},{day:"Tuesday",text:"Bring your laptop tomorrow."},{day:"Wednesday",text:"Library books must be returned today."},{day:"Thursday",text:"Project meeting at 14:00."},{day:"Friday",text:"No class after 12:00."}];
+  announcements = { "Level 4": JSON.parse(JSON.stringify(def)), "Level 5": JSON.parse(JSON.stringify(def)), "Level 6": JSON.parse(JSON.stringify(def)) };
+}
+let books = JSON.parse(localStorage.getItem("sc_books") || "null");
+if(!books || !books["Level 5"]){
+  let defB = [{title:"Database Notes PDF",link:"#"}];
+  books = { "Level 4": JSON.parse(JSON.stringify(defB)), "Level 5": JSON.parse(JSON.stringify(defB)), "Level 6": JSON.parse(JSON.stringify(defB)) };
+}
 let attendance = JSON.parse(localStorage.getItem("sc_attendance") || "[]");
 let currentUser = JSON.parse(localStorage.getItem("sc_current") || "null");
 
@@ -174,104 +172,84 @@ function saveAll(){
 }
 function pad4(n){ return String(n).padStart(4,"0"); }
 function getNextCode(){
-  let used = users.map(u=>parseInt(u.code));
-  let next = 1;
-  while(used.includes(next)) next++;
+  const lvl = document.getElementById("loginLevel") ? document.getElementById("loginLevel").value : "Level 5";
+  let used = users.filter(u=>u.level===lvl).map(u=>parseInt(u.code)).filter(n=>!isNaN(n));
+  let next = 1; while(used.includes(next)) next++;
   return pad4(next);
 }
 function updateNextHint(){
-  document.getElementById("nextCodeHint").textContent = "Next free code is: " + getNextCode() + " - Use this if you are new.";
+  const el = document.getElementById("nextCodeHint");
+  if(el) el.textContent = "Next free code for this Level is: " + getNextCode();
 }
+if(document.getElementById("loginLevel")) document.getElementById("loginLevel").addEventListener("change", updateNextHint);
 updateNextHint();
 
-// ============ DAILY AUTO UPDATE AT 6:00 AM ============
 function checkDailyReset(){
   const today = new Date().toDateString();
   const last = localStorage.getItem("sc_lastDay");
   const nowHour = new Date().getHours();
-  // If new day AND past 6 AM, start fresh view
-  if(last !== today && nowHour >= 6){
-    localStorage.setItem("sc_lastDay", today);
-    // Attendance for new day starts fresh in view, history kept with date
-  }
+  if(last !== today && nowHour >= 6){ localStorage.setItem("sc_lastDay", today); }
   if(!last) localStorage.setItem("sc_lastDay", today);
-  // Auto refresh at 6:00 AM sharp
-  const now = new Date();
-  const six = new Date(); six.setHours(6,0,0,0);
-  if(now < six){
-    setTimeout(()=>location.reload(), six - now);
-  } else {
-    // Check every minute if day changed
-    setInterval(()=>{
-      if(new Date().toDateString() !== localStorage.getItem("sc_lastDay")){
-        location.reload();
-      }
-    }, 60000);
-  }
+  const now = new Date(); const six = new Date(); six.setHours(6,0,0,0);
+  if(now < six){ setTimeout(()=>location.reload(), six - now); }
+  else { setInterval(()=>{ if(new Date().toDateString() !== localStorage.getItem("sc_lastDay")) location.reload(); }, 60000); }
 }
 checkDailyReset();
 
-// ============ LOGIN ============
+// === FIXED: doRegister sasa ina level ===
 function doRegister(){
   const name = document.getElementById("loginName").value.trim();
   let code = document.getElementById("loginCode").value.trim();
+  const level = document.getElementById("loginLevel").value;
   const err = document.getElementById("loginError");
-  if(!name || !code){ err.textContent = "Please enter Name and 4-digit Code."; return; }
+  if(!name || !code){ err.textContent = "Please enter Name and Code."; return; }
   if(!/^\d{4}$/.test(code)){ err.textContent = "Code must be exactly 4 digits, e.g. 0001"; return; }
-  if(code === CR_CODE){ err.textContent = "0000 is reserved for CR only."; return; }
-  // NO DUPLICATE CODE
-  if(users.find(u=>u.code === code)){
-    err.textContent = "Code " + code + " already used by another student! Please use " + getNextCode();
+  if(Object.values(CR_PASSWORDS).includes(code)){ err.textContent = "This code is reserved for CR only."; return; }
+  if(users.find(u=>u.code === code && u.level === level)){
+    err.textContent = "Code " + code + " already used in " + level + "! Please use " + getNextCode();
     return;
   }
-  if(users.find(u=>u.name.toLowerCase() === name.toLowerCase())){
-    err.textContent = "This name already exists. Use different name."; return;
+  if(users.find(u=>u.name.toLowerCase() === name.toLowerCase() && u.level === level)){
+    err.textContent = "This name already exists in " + level + ". Use different name."; return;
   }
-  users.push({name, code, role:"STUDENT"});
+  users.push({name, code, role:"STUDENT", level: level});
   saveAll();
   err.textContent = "";
-  alert("Account created! Now click Login.");
+  alert("Account created for " + level + "! Now click Login.");
   updateNextHint();
 }
+
+// === FIXED: doLogin - hakuna code ya zamani iliyobaki ===
 function doLogin(){
   const name = document.getElementById("loginName").value.trim();
   const code = document.getElementById("loginCode").value.trim();
+  const level = document.getElementById("loginLevel").value;
   const err = document.getElementById("loginError");
   if(!name || !code){ err.textContent = "Enter Name and Code."; return; }
-  // CR LOGIN
-  if(name.toUpperCase() === CR_NAME && code === CR_CODE){
-    currentUser = {name:"CR", code:"0000", role:"CR"};
+  if(code === CR_PASSWORDS[level]){
+    currentUser = {name: name, code: code, role: "CR", level: level};
     localStorage.setItem("sc_current", JSON.stringify(currentUser));
     enterApp(); return;
   }
-  const found = users.find(u=>u.name.toLowerCase() === name.toLowerCase() && u.code === code);
-  if(!found){ err.textContent = "Wrong Name or Code. If you are new, click Create My Account. Next free code: " + getNextCode(); return; }
+  const found = users.find(u => u.name.toLowerCase() === name.toLowerCase() && u.code === code && u.level === level);
+  if(!found){ err.textContent = "Wrong Name / Code / Level. Check your Level. Next free: " + getNextCode(); return; }
   currentUser = found;
   localStorage.setItem("sc_current", JSON.stringify(currentUser));
   enterApp();
 }
-function doLogout(){
-  localStorage.removeItem("sc_current"); currentUser = null;
-  location.reload();
-}
+function doLogout(){ localStorage.removeItem("sc_current"); currentUser = null; location.reload(); }
 function enterApp(){
   document.getElementById("loginCard").classList.add("hidden");
   document.getElementById("app").classList.remove("hidden");
-  document.getElementById("welcomeName").textContent = "Hello, " + currentUser.name;
+  document.getElementById("welcomeName").textContent = "Hello, " + currentUser.name + " - " + currentUser.level;
   document.getElementById("roleLabel").textContent = currentUser.role === "CR" ? "CR - CLASS REP" : "STUDENT";
   if(currentUser.role === "CR"){
     document.getElementById("crPanel").classList.remove("hidden");
+    document.getElementById("crLevelInfo").textContent = "You are CR for " + currentUser.level + " - You can only add for " + currentUser.level;
   }
-  document.getElementById("dateNow").textContent = new Date().toLocaleDateString("en-GB",{weekday:'long',year:'numeric',month:'long',day:'numeric'}) + " | Auto update at 6:00 AM";
-  updateCountdown();
-  renderTimetable("auto");
-  renderAnnouncements();
-  renderBooks();
-  renderMyAttendance();
-  renderCRAttendance();
+  document.getElementById("dateNow").textContent = new Date().toLocaleDateString("en-GB",{weekday:'long',year:'numeric',month:'long',day:'numeric'}) + " | " + currentUser.level + " | Auto update at 6:00 AM";
+  updateCountdown(); renderTimetable("auto"); renderAnnouncements(); renderBooks(); renderMyAttendance(); renderCRAttendance();
 }
-
-// ============ COUNTDOWN ============
 function updateCountdown(){
   const today = new Date(); today.setHours(0,0,0,0);
   const exam = new Date(EXAM_DATE); exam.setHours(0,0,0,0);
@@ -279,72 +257,65 @@ function updateCountdown(){
   document.getElementById("countDays").textContent = days > 0 ? days + " DAYS" : (days===0 ? "TODAY!" : "PASSED");
   document.getElementById("countMsg").textContent = days > 0 ? "Study today, time is going!" : "Exam date: " + EXAM_DATE;
   document.getElementById("countDate").textContent = "Exam Date: " + EXAM_DATE;
-  const box = document.querySelector(".grad-blue");
-  if(days <= 7 && days >= 0) box.style.background = "linear-gradient(135deg,#ff5e62,#ff9966)";
 }
-
-// ============ TIMETABLE ============
 function toMinutes(t){ const p=t.split(":"); return parseInt(p[0])*60+parseInt(p[1]); }
 function getDayName(){ return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][new Date().getDay()]; }
+function myLevel(){ return currentUser && currentUser.level ? currentUser.level : "Level 5"; }
 function renderTimetable(choice){
   const day = choice === "auto" ? getDayName() : choice;
-  document.getElementById("todayName").textContent = day;
-  let list = [...(timetables[day] || [])].sort((a,b)=>toMinutes(a.time)-toMinutes(b.time));
+  document.getElementById("todayName").textContent = day + " - " + myLevel();
+  let list = [...((timetables[myLevel()] && timetables[myLevel()][day]) || [])].sort((a,b)=>toMinutes(a.time)-toMinutes(b.time));
   const el = document.getElementById("timetableList");
   if(list.length===0){ el.innerHTML="<p>No classes today. Rest or read notes.</p>"; return; }
   el.innerHTML = list.map(v=>`<div class="item"><div><b>${v.subject}</b><br><span style="color:#666">${v.room} | ${v.teacher}</span></div><div class="badge">${v.time}</div></div>`).join("");
 }
 function renderAnnouncements(){
   const day = getDayName();
-  const todays = announcements.filter(a=>a.day===day);
+  const todays = (announcements[myLevel()] || []).filter(a=>a.day===day);
   const el = document.getElementById("announcementList");
   if(todays.length===0){ el.innerHTML="<p>No announcement for today.</p>"; return; }
   el.innerHTML = todays.map(a=>`<div class="ann"><b>${a.day}:</b> ${a.text}</div>`).join("");
 }
 function renderBooks(){
-  document.getElementById("bookList").innerHTML = books.map(b=>`<div class="item"><b>📖 ${b.title}</b><a href="${b.link}" class="btn btn-small">Download</a></div>`).join("");
+  document.getElementById("bookList").innerHTML = (books[myLevel()] || []).map(b=>`<div class="item"><b>📖 ${b.title}</b><a href="${b.link}" class="btn btn-small">Download</a></div>`).join("");
 }
-
-// ============ ATTENDANCE ============
 function signAttendance(){
   const today = new Date().toDateString();
-  const exists = attendance.find(a=>a.name===currentUser.name && a.date===today);
+  const exists = attendance.find(a=>a.name===currentUser.name && a.date===today && a.level===myLevel());
   if(exists){ alert("You already signed today!"); return; }
-  attendance.push({name:currentUser.name, code:currentUser.code, date:today, time:new Date().toLocaleTimeString(), subject:"Today"});
+  attendance.push({name:currentUser.name, code:currentUser.code, date:today, level:myLevel(), time:new Date().toLocaleTimeString(), subject:"Today"});
   saveAll(); renderMyAttendance(); renderCRAttendance();
   alert("Welcome! You are marked PRESENT.");
 }
 function renderMyAttendance(){
   const today = new Date().toDateString();
-  const mine = attendance.filter(a=>a.name===currentUser.name);
+  const mine = attendance.filter(a=>a.name===currentUser.name && a.level===myLevel());
   const todayMine = mine.find(a=>a.date===today);
   document.getElementById("myAttendanceStatus").textContent = todayMine ? "✅ You are PRESENT today at " + todayMine.time : "❌ You have NOT signed today yet.";
   document.getElementById("myAttendanceList").innerHTML = mine.length ? mine.map(m=>`<div>✅ ${m.date} - ${m.time}</div>`).join("") : "No attendance yet.";
 }
 function renderCRAttendance(){
   const today = new Date().toDateString();
-  const todays = attendance.filter(a=>a.date===today);
+  const todays = attendance.filter(a=>a.date===today && a.level===myLevel());
   const el = document.getElementById("crAttendance");
   if(!el) return;
   el.innerHTML = todays.length ? todays.map(a=>`<div>✅ ${a.name} (${a.code}) - ${a.time}</div>`).join("") : "No one has signed today yet.";
-  document.getElementById("crAttendanceCount").textContent = "Present today: " + todays.length;
+  document.getElementById("crAttendanceCount").textContent = "Present today in " + myLevel() + ": " + todays.length;
 }
 function exportExcel(){
   const today = new Date().toDateString();
-  const todays = attendance.filter(a=>a.date===today);
-  let csv = "Name,Code,Date,Time\n";
-  todays.forEach(a=> csv += `${a.name},${a.code},${a.date},${a.time}\n`);
+  const todays = attendance.filter(a=>a.date===today && a.level===myLevel());
+  let csv = "Name,Code,Level,Date,Time\n";
+  todays.forEach(a=> csv += `${a.name},${a.code},${a.level},${a.date},${a.time}\n`);
   const blob = new Blob([csv],{type:"text/csv"});
-  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "attendance-"+today+".csv"; a.click();
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "attendance-"+myLevel()+"-"+today+".csv"; a.click();
 }
-
-// ============ CR ADD FORMS ============
 let crType = "";
 function showCrForm(type){
   crType = type;
   document.getElementById("crForm").classList.remove("hidden");
   const title = {timetable:"Add Timetable", subject:"Add Subject to Timetable", announcement:"Add Announcement", book:"Add Book"}[type];
-  document.getElementById("crFormTitle").textContent = title;
+  document.getElementById("crFormTitle").textContent = title + " for " + myLevel();
   let html = "";
   if(type==="timetable" || type==="subject"){
     html = `<select id="crDay"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select>
@@ -366,20 +337,21 @@ function saveCrData(){
     const day = document.getElementById("crDay").value;
     const item = {time:document.getElementById("crTime").value, subject:document.getElementById("crSubject").value, room:document.getElementById("crRoom").value, teacher:document.getElementById("crTeacher").value};
     if(!item.subject){ alert("Enter subject"); return; }
-    if(!timetables[day]) timetables[day]=[];
-    timetables[day].push(item);
+    if(!timetables[myLevel()]) timetables[myLevel()]={};
+    if(!timetables[myLevel()][day]) timetables[myLevel()][day]=[];
+    timetables[myLevel()][day].push(item);
   } else if(crType==="announcement"){
-    announcements.push({day:document.getElementById("crDay").value, text:document.getElementById("crText").value});
+    if(!announcements[myLevel()]) announcements[myLevel()]=[];
+    announcements[myLevel()].push({day:document.getElementById("crDay").value, text:document.getElementById("crText").value});
   } else if(crType==="book"){
-    books.push({title:document.getElementById("crBookTitle").value, link:document.getElementById("crBookLink").value || "#"});
+    if(!books[myLevel()]) books[myLevel()]=[];
+    books[myLevel()].push({title:document.getElementById("crBookTitle").value, link:document.getElementById("crBookLink").value || "#"});
   }
   saveAll();
   document.getElementById("crForm").classList.add("hidden");
   renderTimetable("auto"); renderAnnouncements(); renderBooks();
-  alert("Saved! All students will see it.");
+  alert("Saved for " + myLevel() + "! All students in " + myLevel() + " will see it.");
 }
-
-// Auto login if already logged in
 if(currentUser){ enterApp(); }
 </script>
 </body>
