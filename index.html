@@ -39,7 +39,7 @@
 
   <div class="card" id="loginCard">
     <h2 style="margin:0">👋 Welcome - Login</h2>
-    <p style="color:#666">Student: Name + 4-digit Code. Example: Fadhili / 0001<br>CR: Use your own number. Example: John / <b>IT/4-01</b> | Sara / <b>IT/4-02</b> | David / <b>IT/5-01</b></p>
+    <p style="color:#666">Student: Name + 4-digit Code. Example: Fadhili / 0001<br>CR: Andika Jina lako + Namba yako. Level 4: <b>IT/4-01</b> au <b>IT/4-02</b> | Level 5: <b>IT/5-01</b> au <b>IT/5-02</b> | Level 6: <b>IT/6-01</b> au <b>IT/6-02</b></p>
     <label>Your Name</label>
     <input id="loginName" placeholder="e.g. Fadhili">
     <label>Your Code</label>
@@ -132,15 +132,12 @@
 
 <script>
 const EXAM_DATE = "2026-12-15";
-// EDITED: Kila CR ana namba yake mwenyewe - Badilisha majina hapa kuwa ya ma-CR wenu halisi
-const CR_USERS = [
-  { name: "John",  level: "Level 4", code: "IT/4-01" },
-  { name: "Sara",  level: "Level 4", code: "IT/4-02" },
-  { name: "David", level: "Level 5", code: "IT/5-01" },
-  { name: "Grace", level: "Level 5", code: "IT/5-02" },
-  { name: "Peter", level: "Level 6", code: "IT/6-01" },
-  { name: "Anna",  level: "Level 6", code: "IT/6-02" },
-];
+// MPYA: Hakuna jina la CR lililowekwa - CR anaandika jina lake mwenyewe, mfumo unaangalia Namba tu
+const CR_CODES = {
+  "Level 4": ["IT/4-01", "IT/4-02"],
+  "Level 5": ["IT/5-01", "IT/5-02"],
+  "Level 6": ["IT/6-01", "IT/6-02"]
+};
 
 let users = JSON.parse(localStorage.getItem("sc_users") || "[]");
 
@@ -211,7 +208,9 @@ function doRegister(){
   const err = document.getElementById("loginError");
   if(!name || !code){ err.textContent = "Please enter Name and Code."; return; }
   if(!/^\d{4}$/.test(code)){ err.textContent = "Code must be exactly 4 digits, e.g. 0001"; return; }
-  if(CR_USERS.find(c => c.code === code)){ err.textContent = "This code is reserved for CR only."; return; }
+  // CR codes zote zimehifadhiwa - mwanafunzi hawezi kuzitumia
+  const allCrCodes = Object.values(CR_CODES).flat();
+  if(allCrCodes.includes(code)){ err.textContent = "This code is reserved for CR only."; return; }
   if(users.find(u=>u.code === code && u.level === level)){
     err.textContent = "Code " + code + " already used in " + level + "! Please use " + getNextCode();
     return;
@@ -226,16 +225,16 @@ function doRegister(){
   updateNextHint();
 }
 
-// EDITED: CR login sasa ni Jina + Namba yake mwenyewe + Level
+// MPYA: CR Login - Jina anaandika mwenyewe, tunaangalia Namba + Level tu
 function doLogin(){
   const name = document.getElementById("loginName").value.trim();
   const code = document.getElementById("loginCode").value.trim();
   const level = document.getElementById("loginLevel").value;
   const err = document.getElementById("loginError");
   if(!name || !code){ err.textContent = "Enter Name and Code."; return; }
-  const crFound = CR_USERS.find(c => c.name.toLowerCase() === name.toLowerCase() && c.code === code && c.level === level);
-  if(crFound){
-    currentUser = {name: crFound.name, code: crFound.code, role: "CR", level: crFound.level};
+  // CR: Kama code iko kwenye list ya Level yake, ingia kama CR na jina aliloandika mwenyewe
+  if(CR_CODES[level] && CR_CODES[level].includes(code)){
+    currentUser = {name: name, code: code, role: "CR", level: level};
     localStorage.setItem("sc_current", JSON.stringify(currentUser));
     enterApp(); return;
   }
@@ -302,7 +301,6 @@ function renderMyAttendance(){
   document.getElementById("myAttendanceStatus").textContent = todayMine ? "✅ You are PRESENT today at " + todayMine.time : "❌ You have NOT signed today yet.";
   document.getElementById("myAttendanceList").innerHTML = mine.length ? mine.map(m=>`<div>✅ ${m.date} - ${m.time}</div>`).join("") : "No attendance yet.";
 }
-// EDITED: CR sasa ana kitufe cha kumtoa mtu
 function renderCRAttendance(){
   const today = new Date().toDateString();
   const todays = attendance.filter(a=>a.date===today && a.level===myLevel());
@@ -321,7 +319,6 @@ function renderCRAttendance(){
   }
   document.getElementById("crAttendanceCount").textContent = "Present today in " + myLevel() + ": " + todays.length;
 }
-// EDITED: Function mpya ya kumtoa mtu
 function removeAttendance(index){
   const person = attendance[index];
   if(!person) return;
