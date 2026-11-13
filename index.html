@@ -1,217 +1,386 @@
 <!DOCTYPE html>
-<html lang="sw">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Smart Class Assistant</title>
 <style>
-    * { box-sizing: border-box; font-family: Arial, sans-serif; }
-  body { margin: 0; background: #f2f4f7; padding: 15px; }
-  .container { max-width: 700px; margin: auto; }
-  .card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-  .countdown { background: #1a73e8; color: white; text-align: center; }
-  .countdown h3 { margin: 0; font-size: 14px; }
-  .countdown h1 { font-size: 42px; margin: 5px 0; }
-  .countdown p { margin: 0; font-size: 14px; }
-  .timetable-item { border: 1px solid #ddd; padding: 10px; margin-bottom: 8px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
-  .timetable-item b { font-size: 16px; }
-  .timetable-item span { font-size: 13px; color: #555; }
-  .time-badge { background: #1a73e8; color: white; padding: 6px 10px; border-radius: 8px; font-weight: bold; min-width: 60px; text-align: center; }
-  .btn { display: inline-block; background: #1a73e8; color: white; padding: 10px 15px; border-radius: 8px; text-decoration: none; margin-right: 8px; margin-top: 5px; }
-  .btn-green { background: #2e7d32; }
-  input, select { width: 100%; padding: 10px; margin: 5px 0; border-radius: 8px; border: 1px solid #ccc; }
-  button { background: #1a73e8; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; }
+  *{box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif}
+  body{margin:0;background:linear-gradient(135deg,#667eea 0%,#764ba2 50%,#f093fb 100%);min-height:100vh;padding:15px}
+  .container{max-width:750px;margin:auto}
+  .top{color:white;text-align:center;padding:10px}
+  .top h1{margin:0;font-size:28px;letter-spacing:1px}
+  .top p{opacity:.9;margin:5px 0 15px}
+  .card{background:white;padding:18px;border-radius:20px;margin-bottom:15px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+  .grad-blue{background:linear-gradient(135deg,#1a73e8,#00c6ff);color:white;text-align:center}
+  .grad-purple{background:linear-gradient(135deg,#7b2ff7,#ff2e9a);color:white}
+  .grad-green{background:linear-gradient(135deg,#11998e,#38ef7d);color:white}
+  .grad-orange{background:linear-gradient(135deg,#ff9966,#ff5e62);color:white}
+  .count-num{font-size:48px;font-weight:900;margin:5px 0}
+  .btn{border:none;padding:11px 16px;border-radius:12px;cursor:pointer;font-weight:700;color:white;background:linear-gradient(135deg,#667eea,#764ba2);margin:5px 5px 0 0}
+  .btn-green{background:linear-gradient(135deg,#11998e,#38ef7d)}
+  .btn-red{background:linear-gradient(135deg,#ff5e62,#ff9966)}
+  .btn-small{padding:7px 10px;font-size:13px}
+  input,select,textarea{width:100%;padding:12px;margin:6px 0;border:1px solid #ddd;border-radius:12px;font-size:15px}
+  .item{display:flex;justify-content:space-between;align-items:center;border:1px solid #eee;padding:12px;border-radius:14px;margin-bottom:8px;background:#f9faff}
+  .badge{background:#1a73e8;color:white;padding:7px 11px;border-radius:10px;font-weight:800;min-width:62px;text-align:center}
+  .pill{display:inline-block;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;background:#e8f0fe;color:#1a73e8}
+  .hidden{display:none}
+  .flex{display:flex;gap:10px;flex-wrap:wrap}
+  .ann{border-left:5px solid #ff5e62;background:#fff5f5;padding:12px;border-radius:12px;margin-bottom:8px}
 </style>
 </head>
 <body>
 <div class="container">
-
-  <h2 style="text-align:center;">🎓 SMART CLASS ASSISTANT</h2>
-  <p style="text-align:center; color:#555;">Level 5 IT - Ratiba + Mtihani + Library + Mahudhurio</p>
-
-  <!-- 1. COUNTDOWN - IMERUDISHWA -->
-  <div class="card countdown" id="countdown-box">
-    <h3>MTIHANI UNABAKI</h3>
-    <h1 id="countdown-days">...</h1>
-    <p id="countdown-msg">Inapakia...</p>
-    <p id="countdown-date" style="font-size:12px; opacity:0.9; margin-top:5px;"></p>
+  <div class="top">
+    <h1>🎓 SMART CLASS ASSISTANT</h1>
+    <p>Level 5 IT • Smart • Daily Auto Update at 6:00 AM</p>
+    <div id="dateNow" style="background:rgba(255,255,255,.2);padding:8px;border-radius:12px;display:inline-block"></div>
   </div>
 
-  <!-- 2. RATIBA YA LEO - INABADILIKA KILA SIKU -->
-  <div class="card">
-    <h3 id="timetable-title">Ratiba ya Leo</h3>
-    <p id="timetable-date" style="color:#555; font-size:13px;"></p>
-    <div id="timetable-list"></div>
-    <hr>
-    <p style="font-size:13px; color:#555;">Chagua siku nyingine kuiona:</p>
-    <select id="siku-chagua" onchange="showTimetableByDay(this.value)">
-      <option value="auto">-- Leo (Otomatiki) --</option>
-      <option value="Jumatatu">Jumatatu</option>
-      <option value="Jumanne">Jumanne</option>
-      <option value="Jumatano">Jumatano</option>
-      <option value="Alhamisi">Alhamisi</option>
-      <option value="Ijumaa">Ijumaa</option>
-      <option value="Jumamosi">Jumamosi</option>
-      <option value="Jumapili">Jumapili</option>
-    </select>
+  <!-- LOGIN -->
+  <div class="card" id="loginCard">
+    <h2 style="margin:0">👋 Welcome - Login</h2>
+    <p style="color:#666">Student: Use your Name + 4-digit Code. Example: Fadhili / 0001<br>CR: Name = <b>CR</b> , Code = <b>0000</b></p>
+    <label>Your Name</label>
+    <input id="loginName" placeholder="e.g. Fadhili">
+    <label>Your 4-Digit Code</label>
+    <input id="loginCode" placeholder="e.g. 0001" maxlength="4" inputmode="numeric">
+    <p id="nextCodeHint" style="color:#1a73e8;font-weight:700"></p>
+    <p id="loginError" style="color:red;font-weight:700"></p>
+    <button class="btn" onclick="doLogin()">Login →</button>
+    <button class="btn btn-green" onclick="doRegister()">Create My Account</button>
+    <p style="font-size:13px;color:#777">Rule: One code can be used by ONE student only. 0001 cannot be repeated. Next student uses 0002, 0003...</p>
   </div>
 
-  <!-- 3. E-LIBRARY - IMEBAKI -->
-  <div class="card">
-    <h3>📚 E-Library</h3>
-    <p>Notes na Past Papers mahali pamoja.</p>
-    <a class="btn" href="#">Database Notes PDF</a>
-    <a class="btn" href="#">Past Paper 2024</a>
-    <a class="btn btn-green" href="#">Upload Note</a>
-  </div>
+  <!-- MAIN APP -->
+  <div id="app" class="hidden">
 
-  <!-- 4. MAHUDHURIO - IMEBAKI -->
-  <div class="card">
-    <h3>✅ Mahudhurio ya Leo</h3>
-    <input type="text" id="jina" placeholder="Jina la mwanafunzi">
-    <select id="somo-mahudhurio">
-      <option>Database</option>
-      <option>Web Development</option>
-      <option>Networking</option>
-      <option>Programming</option>
-    </select>
-    <button onclick="wekaMahudhurio()">Weka Mahudhurio</button>
-    <div id="mahudhurio-list" style="margin-top:10px;"></div>
-    <p id="mahudhurio-count" style="font-weight:bold;"></p>
-  </div>
+    <div class="card grad-blue">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><b id="welcomeName">Hello</b><br><span id="roleLabel" class="pill" style="background:white">STUDENT</span></div>
+        <button class="btn btn-red btn-small" onclick="doLogout()">Logout</button>
+      </div>
+      <h3 style="margin:15px 0 0">EXAM COUNTDOWN</h3>
+      <div class="count-num" id="countDays">...</div>
+      <p id="countMsg" style="margin:0"></p>
+      <p id="countDate" style="font-size:12px;opacity:.9"></p>
+    </div>
 
+    <!-- CR PANEL - ONLY CR SEES THIS -->
+    <div class="card grad-purple hidden" id="crPanel">
+      <h2 style="margin:0">👑 CR CONTROL PANEL - You Can Add Anything</h2>
+      <p>Only CR sees this. Students cannot add.</p>
+      <div class="flex">
+        <button class="btn" style="background:white;color:#7b2ff7" onclick="showCrForm('timetable')">+ Add Timetable</button>
+        <button class="btn" style="background:white;color:#7b2ff7" onclick="showCrForm('subject')">+ Add Subject</button>
+        <button class="btn" style="background:white;color:#7b2ff7" onclick="showCrForm('announcement')">+ Add Announcement</button>
+        <button class="btn" style="background:white;color:#7b2ff7" onclick="showCrForm('book')">+ Add Book</button>
+      </div>
+
+      <div id="crForm" class="hidden" style="background:white;color:black;padding:15px;border-radius:14px;margin-top:12px">
+        <h3 id="crFormTitle">Add</h3>
+        <div id="crFormFields"></div>
+        <button class="btn btn-green" onclick="saveCrData()">Save</button>
+        <button class="btn btn-red" onclick="document.getElementById('crForm').classList.add('hidden')">Cancel</button>
+      </div>
+
+      <div style="background:white;color:black;padding:12px;border-radius:14px;margin-top:12px">
+        <h3 style="margin:0">📋 All Students Attendance - CR View</h3>
+        <div id="crAttendance"></div>
+        <p id="crAttendanceCount"></p>
+        <button class="btn btn-green" onclick="exportExcel()">⬇ Download Excel</button>
+      </div>
+    </div>
+
+    <!-- TODAY TIMETABLE -->
+    <div class="card">
+      <h2 style="margin:0">📅 Today's Timetable - <span id="todayName"></span></h2>
+      <p style="color:#666;font-size:13px">Auto changes every day at 6:00 AM. Sorted by time.</p>
+      <div id="timetableList"></div>
+      <label>View other day:</label>
+      <select id="daySelect" onchange="renderTimetable(this.value)">
+        <option value="auto">Today (Auto)</option>
+        <option value="Monday">Monday</option>
+        <option value="Tuesday">Tuesday</option>
+        <option value="Wednesday">Wednesday</option>
+        <option value="Thursday">Thursday</option>
+        <option value="Friday">Friday</option>
+        <option value="Saturday">Saturday</option>
+        <option value="Sunday">Sunday</option>
+      </select>
+    </div>
+
+    <!-- ANNOUNCEMENT OF THE DAY -->
+    <div class="card">
+      <h2 style="margin:0">📢 Today's Announcement</h2>
+      <div id="announcementList"></div>
+    </div>
+
+    <!-- ATTENDANCE - STUDENT SIGNS -->
+    <div class="card grad-green">
+      <h2 style="margin:0">✅ Attendance - Sign If You Are In Class</h2>
+      <p>Tap once. CR will see you immediately.</p>
+      <p id="myAttendanceStatus" style="font-weight:800"></p>
+      <button class="btn" style="background:white;color:#11998e" onclick="signAttendance()">I AM PRESENT TODAY ✅</button>
+      <div id="myAttendanceList" style="margin-top:10px;background:white;color:black;padding:10px;border-radius:12px"></div>
+    </div>
+
+    <!-- LIBRARY -->
+    <div class="card">
+      <h2 style="margin:0">📚 E-Library</h2>
+      <div id="bookList"></div>
+    </div>
+
+  </div>
 </div>
 
 <script>
-// ====================================================
-// SEHEMU A: TAREHE YA MTIHANI - BADILISHA HAPA TU
-// ====================================================
-const TAREHE_YA_MTIHANI = "2026-12-15"; // Badilisha: mfano "2026-11-20"
+// ============ CONFIG ============
+const EXAM_DATE = "2026-12-15"; // CR can change in code: e.g. "2026-11-20"
+const CR_NAME = "CR";
+const CR_CODE = "0000";
 
-// ====================================================
-// SEHEMU B: RATIBA YA WIKI - BADILISHA HAPA MASOMO YENU
-// ====================================================
-const TIMETABLE = {
-  "Jumatatu": [
-    { time: "08:00", subject: "Database", room: "Room 5", teacher: "Mr. John" },
-    { time: "10:30", subject: "Web Development", room: "Lab 2", teacher: "Madam Anna" },
-    { time: "14:00", subject: "Networking", room: "Room 5", teacher: "Mr. Peter" }
-  ],
-  "Jumanne": [
-    { time: "08:00", subject: "Database", room: "Room 5", teacher: "Mr. John" },
-    { time: "11:00", subject: "System Analysis", room: "Room 3", teacher: "Madam Sara" }
-  ],
-  "Jumatano": [
-    { time: "09:00", subject: "Programming", room: "Lab 1", teacher: "Mr. David" },
-    { time: "13:00", subject: "English", room: "Room 5", teacher: "Madam Grace" }
-  ],
-  "Alhamisi": [
-    { time: "08:00", subject: "Networking", room: "Room 5", teacher: "Mr. Peter" },
-    { time: "10:00", subject: "Database Practical", room: "Lab 2", teacher: "Mr. John" },
-    { time: "14:30", subject: "Entrepreneurship", room: "Room 3", teacher: "Madam Anna" }
-  ],
-  "Ijumaa": [
-    { time: "08:30", subject: "Web Development", room: "Lab 2", teacher: "Madam Anna" },
-    { time: "11:00", subject: "Project", room: "Room 5", teacher: "Mr. David" }
-  ],
-  "Jumamosi": [],
-  "Jumapili": []
-};
+// ============ STORAGE ============
+let users = JSON.parse(localStorage.getItem("sc_users") || "[]");
+let timetables = JSON.parse(localStorage.getItem("sc_timetables") || JSON.stringify({
+  "Monday":[{time:"08:00",subject:"Database",room:"Room 5",teacher:"Mr. John"}],
+  "Tuesday":[{time:"08:00",subject:"Database",room:"Room 5",teacher:"Mr. John"},{time:"11:00",subject:"System Analysis",room:"Room 3",teacher:"Madam Sara"}],
+  "Wednesday":[{time:"09:00",subject:"Programming",room:"Lab 1",teacher:"Mr. David"}],
+  "Thursday":[{time:"08:00",subject:"Networking",room:"Room 5",teacher:"Mr. Peter"},{time:"14:30",subject:"Entrepreneurship",room:"Room 3",teacher:"Madam Anna"}],
+  "Friday":[{time:"08:30",subject:"Web Development",room:"Lab 2",teacher:"Madam Anna"}],
+  "Saturday":[],"Sunday":[]
+}));
+let announcements = JSON.parse(localStorage.getItem("sc_announcements") || JSON.stringify([
+  {day:"Monday",text:"Welcome to new week! Database test on Friday."},
+  {day:"Tuesday",text:"Bring your laptop tomorrow for Practical."},
+  {day:"Wednesday",text:"Library books must be returned today."},
+  {day:"Thursday",text:"Project group meeting at 14:00."},
+  {day:"Friday",text:"No class after 12:00. Enjoy weekend."}
+]));
+let books = JSON.parse(localStorage.getItem("sc_books") || JSON.stringify([
+  {title:"Database Notes PDF",link:"#"},
+  {title:"Past Paper 2024",link:"#"}
+]));
+let attendance = JSON.parse(localStorage.getItem("sc_attendance") || "[]");
+let currentUser = JSON.parse(localStorage.getItem("sc_current") || "null");
 
-// ====================================================
-// SEHEMU C: COUNTDOWN - USIGUSE
-// ====================================================
-function updateCountdown() {
-  const leo = new Date(); leo.setHours(0,0,0,0);
-  const mtihani = new Date(TAREHE_YA_MTIHANI); mtihani.setHours(0,0,0,0);
-  const siku = Math.ceil((mtihani - leo) / (1000*60*60*24));
+function saveAll(){
+  localStorage.setItem("sc_users",JSON.stringify(users));
+  localStorage.setItem("sc_timetables",JSON.stringify(timetables));
+  localStorage.setItem("sc_announcements",JSON.stringify(announcements));
+  localStorage.setItem("sc_books",JSON.stringify(books));
+  localStorage.setItem("sc_attendance",JSON.stringify(attendance));
+}
+function pad4(n){ return String(n).padStart(4,"0"); }
+function getNextCode(){
+  let used = users.map(u=>parseInt(u.code));
+  let next = 1;
+  while(used.includes(next)) next++;
+  return pad4(next);
+}
+function updateNextHint(){
+  document.getElementById("nextCodeHint").textContent = "Next free code is: " + getNextCode() + " - Use this if you are new.";
+}
+updateNextHint();
 
-  const daysEl = document.getElementById("countdown-days");
-  const msgEl = document.getElementById("countdown-msg");
-  const boxEl = document.getElementById("countdown-box");
-  const dateEl = document.getElementById("countdown-date");
-  dateEl.textContent = "Tarehe ya Mtihani: " + TAREHE_YA_MTIHANI;
-
-  if (siku > 0) {
-    daysEl.textContent = siku + " SIKU";
-    msgEl.textContent = "Soma leo, muda unakwenda!";
-    if (siku <= 7) { boxEl.style.background = "#d32f2f"; msgEl.textContent = "Hatari! Zimebaki siku " + siku + " tu!"; }
-    else if (siku <= 30) { boxEl.style.background = "#ff9800"; }
-    else { boxEl.style.background = "#1a73e8"; }
-  } else if (siku === 0) {
-    daysEl.textContent = "LEO!"; msgEl.textContent = "Mtihani ni leo. Kila la heri!"; boxEl.style.background = "#d32f2f";
+// ============ DAILY AUTO UPDATE AT 6:00 AM ============
+function checkDailyReset(){
+  const today = new Date().toDateString();
+  const last = localStorage.getItem("sc_lastDay");
+  const nowHour = new Date().getHours();
+  // If new day AND past 6 AM, start fresh view
+  if(last !== today && nowHour >= 6){
+    localStorage.setItem("sc_lastDay", today);
+    // Attendance for new day starts fresh in view, history kept with date
+  }
+  if(!last) localStorage.setItem("sc_lastDay", today);
+  // Auto refresh at 6:00 AM sharp
+  const now = new Date();
+  const six = new Date(); six.setHours(6,0,0,0);
+  if(now < six){
+    setTimeout(()=>location.reload(), six - now);
   } else {
-    daysEl.textContent = "IMESHAFIKA"; msgEl.textContent = "Mtihani umeshapita. Weka tarehe mpya.";
+    // Check every minute if day changed
+    setInterval(()=>{
+      if(new Date().toDateString() !== localStorage.getItem("sc_lastDay")){
+        location.reload();
+      }
+    }, 60000);
   }
 }
+checkDailyReset();
 
-// ====================================================
-// SEHEMU D: RATIBA INABADILIKA KILA SIKU + INAJIPANGA KWA MUDA
-// ====================================================
-function mudaKwaDakika(time) {
-  const parts = time.split(":");
-  return parseInt(parts[0]) * 60 + parseInt(parts[1]);
-}
-
-function onyeshaRatiba(jinaLaSiku) {
-  const title = document.getElementById("timetable-title");
-  const list = document.getElementById("timetable-list");
-  const dateEl = document.getElementById("timetable-date");
-
-  title.textContent = "Ratiba ya " + jinaLaSiku;
-  dateEl.textContent = "Leo ni " + new Date().toLocaleDateString("sw-TZ", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
-  let vipindi = TIMETABLE[jinaLaSiku] || [];
-
-  if (vipindi.length === 0) {
-    list.innerHTML = "<p>Leo hakuna vipindi. Pumzika au soma notes.</p>";
+// ============ LOGIN ============
+function doRegister(){
+  const name = document.getElementById("loginName").value.trim();
+  let code = document.getElementById("loginCode").value.trim();
+  const err = document.getElementById("loginError");
+  if(!name || !code){ err.textContent = "Please enter Name and 4-digit Code."; return; }
+  if(!/^\d{4}$/.test(code)){ err.textContent = "Code must be exactly 4 digits, e.g. 0001"; return; }
+  if(code === CR_CODE){ err.textContent = "0000 is reserved for CR only."; return; }
+  // NO DUPLICATE CODE
+  if(users.find(u=>u.code === code)){
+    err.textContent = "Code " + code + " already used by another student! Please use " + getNextCode();
     return;
   }
-
-  // HAPA NDIPO VINAJIPANGA KWA MUDA - hata kama ni 5, vinapangika
-  vipindi = [...vipindi].sort((a,b) => mudaKwaDakika(a.time) - mudaKwaDakika(b.time));
-
-  list.innerHTML = vipindi.map(v => `
-    <div class="timetable-item">
-      <div><b>${v.subject}</b><br><span>${v.room} | ${v.teacher}</span></div>
-      <div class="time-badge">${v.time}</div>
-    </div>
-  `).join("");
-}
-
-function showTimetableByDay(chaguo) {
-  if (chaguo === "auto") {
-    const sikuZaWiki = ["Jumapili","Jumatatu","Jumanne","Jumatano","Alhamisi","Ijumaa","Jumamosi"];
-    onyeshaRatiba(sikuZaWiki[new Date().getDay()]);
-  } else {
-    onyeshaRatiba(chaguo);
+  if(users.find(u=>u.name.toLowerCase() === name.toLowerCase())){
+    err.textContent = "This name already exists. Use different name."; return;
   }
+  users.push({name, code, role:"STUDENT"});
+  saveAll();
+  err.textContent = "";
+  alert("Account created! Now click Login.");
+  updateNextHint();
+}
+function doLogin(){
+  const name = document.getElementById("loginName").value.trim();
+  const code = document.getElementById("loginCode").value.trim();
+  const err = document.getElementById("loginError");
+  if(!name || !code){ err.textContent = "Enter Name and Code."; return; }
+  // CR LOGIN
+  if(name.toUpperCase() === CR_NAME && code === CR_CODE){
+    currentUser = {name:"CR", code:"0000", role:"CR"};
+    localStorage.setItem("sc_current", JSON.stringify(currentUser));
+    enterApp(); return;
+  }
+  const found = users.find(u=>u.name.toLowerCase() === name.toLowerCase() && u.code === code);
+  if(!found){ err.textContent = "Wrong Name or Code. If you are new, click Create My Account. Next free code: " + getNextCode(); return; }
+  currentUser = found;
+  localStorage.setItem("sc_current", JSON.stringify(currentUser));
+  enterApp();
+}
+function doLogout(){
+  localStorage.removeItem("sc_current"); currentUser = null;
+  location.reload();
+}
+function enterApp(){
+  document.getElementById("loginCard").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+  document.getElementById("welcomeName").textContent = "Hello, " + currentUser.name;
+  document.getElementById("roleLabel").textContent = currentUser.role === "CR" ? "CR - CLASS REP" : "STUDENT";
+  if(currentUser.role === "CR"){
+    document.getElementById("crPanel").classList.remove("hidden");
+  }
+  document.getElementById("dateNow").textContent = new Date().toLocaleDateString("en-GB",{weekday:'long',year:'numeric',month:'long',day:'numeric'}) + " | Auto update at 6:00 AM";
+  updateCountdown();
+  renderTimetable("auto");
+  renderAnnouncements();
+  renderBooks();
+  renderMyAttendance();
+  renderCRAttendance();
 }
 
-// ====================================================
-// SEHEMU E: MAHUDHURIO RAHISI - IMEBAKI
-// ====================================================
-let mahudhurio = JSON.parse(localStorage.getItem("mahudhurio") || "[]");
-function wekaMahudhurio() {
-  const jina = document.getElementById("jina").value.trim();
-  const somo = document.getElementById("somo-mahudhurio").value;
-  if (!jina) { alert("Andika jina kwanza"); return; }
-  mahudhurio.push({ jina, somo, tarehe: new Date().toLocaleDateString() });
-  localStorage.setItem("mahudhurio", JSON.stringify(mahudhurio));
-  document.getElementById("jina").value = "";
-  onyeshaMahudhurio();
-}
-function onyeshaMahudhurio() {
-  const list = document.getElementById("mahudhurio-list");
-  const count = document.getElementById("mahudhurio-count");
-  list.innerHTML = mahudhurio.map(m => `<div>✅ ${m.jina} - ${m.somo} - ${m.tarehe}</div>`).join("");
-  count.textContent = "Wamehudhuria leo: " + mahudhurio.length;
+// ============ COUNTDOWN ============
+function updateCountdown(){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const exam = new Date(EXAM_DATE); exam.setHours(0,0,0,0);
+  const days = Math.ceil((exam - today)/(1000*60*60*24));
+  document.getElementById("countDays").textContent = days > 0 ? days + " DAYS" : (days===0 ? "TODAY!" : "PASSED");
+  document.getElementById("countMsg").textContent = days > 0 ? "Study today, time is going!" : "Exam date: " + EXAM_DATE;
+  document.getElementById("countDate").textContent = "Exam Date: " + EXAM_DATE;
+  const box = document.querySelector(".grad-blue");
+  if(days <= 7 && days >= 0) box.style.background = "linear-gradient(135deg,#ff5e62,#ff9966)";
 }
 
-// ANZA KAZI
-updateCountdown();
-showTimetableByDay("auto");
-onyeshaMahudhurio();
+// ============ TIMETABLE ============
+function toMinutes(t){ const p=t.split(":"); return parseInt(p[0])*60+parseInt(p[1]); }
+function getDayName(){ return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][new Date().getDay()]; }
+function renderTimetable(choice){
+  const day = choice === "auto" ? getDayName() : choice;
+  document.getElementById("todayName").textContent = day;
+  let list = [...(timetables[day] || [])].sort((a,b)=>toMinutes(a.time)-toMinutes(b.time));
+  const el = document.getElementById("timetableList");
+  if(list.length===0){ el.innerHTML="<p>No classes today. Rest or read notes.</p>"; return; }
+  el.innerHTML = list.map(v=>`<div class="item"><div><b>${v.subject}</b><br><span style="color:#666">${v.room} | ${v.teacher}</span></div><div class="badge">${v.time}</div></div>`).join("");
+}
+function renderAnnouncements(){
+  const day = getDayName();
+  const todays = announcements.filter(a=>a.day===day);
+  const el = document.getElementById("announcementList");
+  if(todays.length===0){ el.innerHTML="<p>No announcement for today.</p>"; return; }
+  el.innerHTML = todays.map(a=>`<div class="ann"><b>${a.day}:</b> ${a.text}</div>`).join("");
+}
+function renderBooks(){
+  document.getElementById("bookList").innerHTML = books.map(b=>`<div class="item"><b>📖 ${b.title}</b><a href="${b.link}" class="btn btn-small">Download</a></div>`).join("");
+}
+
+// ============ ATTENDANCE ============
+function signAttendance(){
+  const today = new Date().toDateString();
+  const exists = attendance.find(a=>a.name===currentUser.name && a.date===today);
+  if(exists){ alert("You already signed today!"); return; }
+  attendance.push({name:currentUser.name, code:currentUser.code, date:today, time:new Date().toLocaleTimeString(), subject:"Today"});
+  saveAll(); renderMyAttendance(); renderCRAttendance();
+  alert("Welcome! You are marked PRESENT.");
+}
+function renderMyAttendance(){
+  const today = new Date().toDateString();
+  const mine = attendance.filter(a=>a.name===currentUser.name);
+  const todayMine = mine.find(a=>a.date===today);
+  document.getElementById("myAttendanceStatus").textContent = todayMine ? "✅ You are PRESENT today at " + todayMine.time : "❌ You have NOT signed today yet.";
+  document.getElementById("myAttendanceList").innerHTML = mine.length ? mine.map(m=>`<div>✅ ${m.date} - ${m.time}</div>`).join("") : "No attendance yet.";
+}
+function renderCRAttendance(){
+  const today = new Date().toDateString();
+  const todays = attendance.filter(a=>a.date===today);
+  const el = document.getElementById("crAttendance");
+  if(!el) return;
+  el.innerHTML = todays.length ? todays.map(a=>`<div>✅ ${a.name} (${a.code}) - ${a.time}</div>`).join("") : "No one has signed today yet.";
+  document.getElementById("crAttendanceCount").textContent = "Present today: " + todays.length;
+}
+function exportExcel(){
+  const today = new Date().toDateString();
+  const todays = attendance.filter(a=>a.date===today);
+  let csv = "Name,Code,Date,Time\n";
+  todays.forEach(a=> csv += `${a.name},${a.code},${a.date},${a.time}\n`);
+  const blob = new Blob([csv],{type:"text/csv"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "attendance-"+today+".csv"; a.click();
+}
+
+// ============ CR ADD FORMS ============
+let crType = "";
+function showCrForm(type){
+  crType = type;
+  document.getElementById("crForm").classList.remove("hidden");
+  const title = {timetable:"Add Timetable", subject:"Add Subject to Timetable", announcement:"Add Announcement", book:"Add Book"}[type];
+  document.getElementById("crFormTitle").textContent = title;
+  let html = "";
+  if(type==="timetable" || type==="subject"){
+    html = `<select id="crDay"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select>
+    <input id="crTime" type="time" value="08:00">
+    <input id="crSubject" placeholder="Subject e.g. Database">
+    <input id="crRoom" placeholder="Room e.g. Room 5">
+    <input id="crTeacher" placeholder="Teacher e.g. Mr. John">`;
+  } else if(type==="announcement"){
+    html = `<select id="crDay"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option></select>
+    <textarea id="crText" placeholder="Announcement for that day..."></textarea>`;
+  } else if(type==="book"){
+    html = `<input id="crBookTitle" placeholder="Book title e.g. Database Notes">
+    <input id="crBookLink" placeholder="Link or #">`;
+  }
+  document.getElementById("crFormFields").innerHTML = html;
+}
+function saveCrData(){
+  if(crType==="timetable" || crType==="subject"){
+    const day = document.getElementById("crDay").value;
+    const item = {time:document.getElementById("crTime").value, subject:document.getElementById("crSubject").value, room:document.getElementById("crRoom").value, teacher:document.getElementById("crTeacher").value};
+    if(!item.subject){ alert("Enter subject"); return; }
+    if(!timetables[day]) timetables[day]=[];
+    timetables[day].push(item);
+  } else if(crType==="announcement"){
+    announcements.push({day:document.getElementById("crDay").value, text:document.getElementById("crText").value});
+  } else if(crType==="book"){
+    books.push({title:document.getElementById("crBookTitle").value, link:document.getElementById("crBookLink").value || "#"});
+  }
+  saveAll();
+  document.getElementById("crForm").classList.add("hidden");
+  renderTimetable("auto"); renderAnnouncements(); renderBooks();
+  alert("Saved! All students will see it.");
+}
+
+// Auto login if already logged in
+if(currentUser){ enterApp(); }
 </script>
 </body>
 </html>
