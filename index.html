@@ -39,7 +39,6 @@
 
   <div class="card" id="loginCard">
     <h2 style="margin:0">👋 Welcome - Login</h2>
-    <!-- MPYA: Example zimeondolewa - hakuna Fadhili / 0001 wala IT/4-01 zinazoonekana -->
     <p style="color:#666">Please enter your details to continue.</p>
     <label>Your Name</label>
     <input id="loginName" placeholder="Your Name">
@@ -51,13 +50,20 @@
       <option value="Level 5" selected>Level 5</option>
       <option value="Level 6">Level 6</option>
     </select>
-    <!-- MPYA: Hint ya Next Code imefichwa pia ili example zisionekane -->
     <p id="nextCodeHint" style="color:#1a73e8;font-weight:700;display:none"></p>
     <p id="loginError" style="color:red;font-weight:700"></p>
     <button class="btn" onclick="doLogin()">Login →</button>
     <button class="btn btn-green" onclick="doRegister()">Create My Account</button>
-    <!-- MPYA: Rule ya One code imefichwa - haionekani tena -->
     <p style="font-size:13px;color:#777;display:none">Rule: One code can be used by ONE student only in same Level.</p>
+    <!-- MPYA: Kusaidia kuingia tena - haibadili kingine -->
+    <hr>
+    <div style="background:#fff7ed;border:2px dashed #f97316;padding:12px;border-radius:12px;text-align:center">
+      <b>⚠️ Huwezi kuingia?</b><br>
+      <button class="btn" style="background:#f97316" onclick="showMyAccounts()">🔍 Nimesahau - Nionyeshe Akaunti Zangu</button>
+      <div id="myAccountsBox" style="text-align:left;margin-top:10px"></div>
+      <button class="btn btn-red btn-small" onclick="resetAllAccounts()">🗑️ Futa Zote & Anza Upya</button>
+      <p style="font-size:12px;color:#666;margin:5px 0 0">CR: Jina lako lolote + Code ya Level yako + Level sahihi. Mf: Level 5 = IT/5-01</p>
+    </div>
   </div>
 
   <div id="app" class="hidden">
@@ -80,7 +86,6 @@
         <button class="btn" style="background:white;color:#7b2ff7" onclick="showCrForm('subject')">+ Add Subject</button>
         <button class="btn" style="background:white;color:#7b2ff7" onclick="showCrForm('announcement')">+ Add Announcement</button>
         <button class="btn" style="background:white;color:#7b2ff7" onclick="showCrForm('book')">+ Add Book</button>
-        <!-- MPYA: Kitufe cha Add Notes kutoka kwenye File za simu -->
         <button class="btn" style="background:white;color:#7b2ff7" onclick="showCrForm('notes')">+ Add Notes 📄</button>
       </div>
       <div id="crForm" class="hidden" style="background:white;color:black;padding:15px;border-radius:14px;margin-top:12px">
@@ -128,7 +133,6 @@
       <div id="myAttendanceList" style="margin-top:10px;background:white;color:black;padding:10px;border-radius:12px"></div>
     </div>
 
-    <!-- MPYA: Sehemu ya Notes - Wanafunzi wataona hapa -->
     <div class="card">
       <h2 style="margin:0">📄 Class Notes - From CR</h2>
       <p style="color:#666;font-size:13px">Notes uploaded by CR from phone files. Tap Download to read.</p>
@@ -176,7 +180,6 @@ if(!books || !books["Level 5"]){
   let defB = [{title:"Database Notes PDF",link:"#"}];
   books = { "Level 4": JSON.parse(JSON.stringify(defB)), "Level 5": JSON.parse(JSON.stringify(defB)), "Level 6": JSON.parse(JSON.stringify(defB)) };
 }
-// MPYA: Hifadhi ya Notes
 let notes = JSON.parse(localStorage.getItem("sc_notes") || "null");
 if(!notes || !notes["Level 5"]){
   notes = { "Level 4": [], "Level 5": [], "Level 6": [] };
@@ -190,7 +193,6 @@ function saveAll(){
   localStorage.setItem("sc_announcements",JSON.stringify(announcements));
   localStorage.setItem("sc_books",JSON.stringify(books));
   localStorage.setItem("sc_attendance",JSON.stringify(attendance));
-  // MPYA: Hifadhi Notes pia
   try{ localStorage.setItem("sc_notes",JSON.stringify(notes)); }catch(e){ alert("File ni kubwa sana! Tafadhali tumia PDF ndogo chini ya 3MB."); }
 }
 function pad4(n){ return String(n).padStart(4,"0"); }
@@ -206,6 +208,31 @@ function updateNextHint(){
 }
 if(document.getElementById("loginLevel")) document.getElementById("loginLevel").addEventListener("change", updateNextHint);
 updateNextHint();
+
+// MPYA: Kusaidia kuingia tena
+function showMyAccounts(){
+  const box = document.getElementById("myAccountsBox");
+  if(users.length===0){
+    box.innerHTML = "<p style='color:red;font-weight:700'>❌ Hakuna akaunti yoyote kwenye simu hii! Lazima ubonyeze <b>Create My Account</b> kwanza, au ingia kama CR.</p><p>CR: Jina lako + <b>IT/5-01</b> + Level 5 (kama uko Level 5)</p>";
+    return;
+  }
+  box.innerHTML = "<b>Akaunti zilizopo kwenye simu hii:</b><br>" + users.map(u=>`✅ <b>${u.name}</b> | Code: <b>${u.code}</b> | ${u.level} | <button onclick="fillLogin('${u.name}','${u.code}','${u.level}')" style='background:#16a34a;color:white;border:none;padding:4px 8px;border-radius:8px;cursor:pointer'>Tumia Hii →</button>`).join("<br>") + "<br><small>Bonyeza 'Tumia Hii' - itajaza yenyewe kisha bonyeza Login.</small>";
+}
+function fillLogin(name,code,level){
+  document.getElementById("loginName").value = name;
+  document.getElementById("loginCode").value = code;
+  document.getElementById("loginLevel").value = level;
+  document.getElementById("loginError").textContent = "Sasa bonyeza Login →";
+  window.scrollTo(0,0);
+}
+function resetAllAccounts(){
+  if(!confirm("Uko na uhakika unataka kufuta akaunti ZOTE na kuanza upya? Timetable na Notes zako hazitafutika.")) return;
+  localStorage.removeItem("sc_users");
+  localStorage.removeItem("sc_current");
+  users = [];
+  alert("Imefutwa! Sasa tengeneza akaunti mpya: Andika Jina + Code mpya + Bonyeza Create My Account, kisha Login.");
+  location.reload();
+}
 
 function checkDailyReset(){
   const today = new Date().toDateString();
@@ -254,7 +281,7 @@ function doLogin(){
     enterApp(); return;
   }
   const found = users.find(u => u.name.toLowerCase() === name.toLowerCase() && u.code === code && u.level === level);
-  if(!found){ err.textContent = "Wrong Name / Code / Level. Check your Level."; return; }
+  if(!found){ err.textContent = "Wrong Name / Code / Level. Bonyeza chini 'Nimesahau - Nionyeshe Akaunti Zangu' kuona akaunti zako sahihi."; return; }
   currentUser = found;
   localStorage.setItem("sc_current", JSON.stringify(currentUser));
   enterApp();
@@ -301,7 +328,6 @@ function renderAnnouncements(){
 function renderBooks(){
   document.getElementById("bookList").innerHTML = (books[myLevel()] || []).map(b=>`<div class="item"><b>📖 ${b.title}</b><a href="${b.link}" class="btn btn-small">Download</a></div>`).join("");
 }
-// MPYA: Onyesha Notes
 function renderNotes(){
   const el = document.getElementById("notesList");
   if(!el) return;
@@ -390,7 +416,6 @@ function showCrForm(type){
     html = `<input id="crBookTitle" placeholder="Book title e.g. Database Notes">
     <input id="crBookLink" placeholder="Link or #">`;
   } else if(type==="notes"){
-    // MPYA: Kuchukua File kutoka kwenye simu
     html = `<input id="crNoteTitle" placeholder="Note Title e.g. Database Chapter 1">
     <input id="crNoteSubject" placeholder="Subject e.g. Database">
     <label style="font-weight:700">📁 Chagua File Kutoka Kwenye Simu Yako (PDF / Picha / Word):</label>
@@ -399,4 +424,51 @@ function showCrForm(type){
     <p style="font-size:12px;color:#888">File lazima iwe ndogo - chini ya 3MB ili isihifadhiwe vizuri.</p>`;
     setTimeout(()=>{
       const f = document.getElementById("crNoteFile");
-      if(f) f
+      if(f) f.onchange = ()=>{ if(f.files[0]) document.getElementById("noteFileName").textContent = "✅ Umechagua: " + f.files[0].name + " (" + Math.round(f.files[0].size/1024) + " KB)"; };
+    },100);
+  }
+  document.getElementById("crFormFields").innerHTML = html;
+}
+function saveCrData(){
+  if(crType==="timetable" || crType==="subject"){
+    const day = document.getElementById("crDay").value;
+    const item = {time:document.getElementById("crTime").value, subject:document.getElementById("crSubject").value, room:document.getElementById("crRoom").value, teacher:document.getElementById("crTeacher").value};
+    if(!item.subject){ alert("Enter subject"); return; }
+    if(!timetables[myLevel()]) timetables[myLevel()]={};
+    if(!timetables[myLevel()][day]) timetables[myLevel()][day]=[];
+    timetables[myLevel()][day].push(item);
+  } else if(crType==="announcement"){
+    if(!announcements[myLevel()]) announcements[myLevel()]=[];
+    announcements[myLevel()].push({day:document.getElementById("crDay").value, text:document.getElementById("crText").value});
+  } else if(crType==="book"){
+    if(!books[myLevel()]) books[myLevel()]=[];
+    books[myLevel()].push({title:document.getElementById("crBookTitle").value, link:document.getElementById("crBookLink").value || "#"});
+  } else if(crType==="notes"){
+    const title = document.getElementById("crNoteTitle").value.trim();
+    const subject = document.getElementById("crNoteSubject").value.trim();
+    const fileInput = document.getElementById("crNoteFile");
+    if(!title){ alert("Andika Title ya Note"); return; }
+    if(!fileInput.files || !fileInput.files[0]){ alert("Chagua File kwanza kutoka kwenye simu yako!"); return; }
+    const file = fileInput.files[0];
+    if(file.size > 3*1024*1024){ alert("File ni kubwa sana! Tafadhali tumia chini ya 3MB."); return; }
+    const reader = new FileReader();
+    reader.onload = function(e){
+      if(!notes[myLevel()]) notes[myLevel()]=[];
+      notes[myLevel()].push({title:title, subject:subject||"General", fileName:file.name, fileData:e.target.result, by:currentUser.name, date:new Date().toDateString()});
+      saveAll();
+      document.getElementById("crForm").classList.add("hidden");
+      renderNotes();
+      alert("✅ Notes imeongezwa! Wanafunzi wa " + myLevel() + " wataiona sasa.");
+    };
+    reader.readAsDataURL(file);
+    return;
+  }
+  saveAll();
+  document.getElementById("crForm").classList.add("hidden");
+  renderTimetable("auto"); renderAnnouncements(); renderBooks(); renderNotes();
+  alert("Saved for " + myLevel() + "! All students in " + myLevel() + " will see it.");
+}
+if(currentUser){ enterApp(); }
+</script>
+</body>
+</html>
