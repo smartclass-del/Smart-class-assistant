@@ -86,6 +86,14 @@
         <button class="btn" style="background:white;color:#7b2ff7" onclick="showCrForm('book')">+ Add Book</button>
         <button class="btn" style="background:white;color:#7b2ff7" onclick="showCrForm('notes')">+ Add Notes 📄</button>
       </div>
+      <!-- MPYA: Kufuta Timetable -->
+      <div style="background:#ffeded;padding:12px;border-radius:14px;margin-top:12px;border:2px dashed #ff5e62">
+        <b style="color:#b91c1c">🗑️ Futa Timetable - CR Tu</b><br>
+        <p style="color:#333;font-size:13px;margin:5px 0">Hii inafuta Timetable TU. Haitagusa Notes, Announcement wala Books.</p>
+        <button class="btn btn-red" onclick="deleteAllTimetable()">🗑️ Futa Ratiba ZOTE za Level Yangu</button>
+        <button class="btn" style="background:#f97316" onclick="deleteDayTimetable()">🗑️ Futa Ratiba ya Siku Moja</button>
+        <p style="font-size:12px;color:#666;margin:5px 0 0">Baada ya kufuta, tengeneza mpya kwa kubonyeza + Add Timetable juu.</p>
+      </div>
       <div id="crForm" class="hidden" style="background:white;color:black;padding:15px;border-radius:14px;margin-top:12px">
         <h3 id="crFormTitle">Add</h3>
         <div id="crFormFields"></div>
@@ -148,7 +156,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
-// MPYA: Firebase yako sahihi ya SMART CLASS - kutoka kwenye screenshot yako
 const firebaseConfig = {
   apiKey: "AIzaSyCgkQ-N-ASZQMQCwEGcFqNqTJLRpCjh7s",
   authDomain: "smart-class-3a3bc.firebaseapp.com",
@@ -160,7 +167,6 @@ const firebaseConfig = {
 };
 let db=null;
 try{ firebase.initializeApp(firebaseConfig); db=firebase.firestore(); }catch(e){ console.log("Firebase error",e); }
-
 const EXAM_DATE = "2026-12-15";
 const CR_CODES = { "Level 4": ["IT/4-01", "IT/4-02"], "Level 5": ["IT/5-01", "IT/5-02"], "Level 6": ["IT/6-01", "IT/6-02"] };
 let users = JSON.parse(localStorage.getItem("sc_users") || "[]");
@@ -261,7 +267,35 @@ function updateCountdown(){ const today = new Date(); today.setHours(0,0,0,0); c
 function toMinutes(t){ const p=t.split(":"); return parseInt(p[0])*60+parseInt(p[1]); }
 function getDayName(){ return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][new Date().getDay()]; }
 function myLevel(){ return currentUser && currentUser.level ? currentUser.level : "Level 5"; }
-function renderTimetable(choice){ const day = choice === "auto" ? getDayName() : choice; document.getElementById("todayName").textContent = day + " - " + myLevel(); let list = [...((timetables[myLevel()] && timetables[myLevel()][day]) || [])].sort((a,b)=>toMinutes(a.time)-toMinutes(b.time)); const el = document.getElementById("timetableList"); if(list.length===0){ el.innerHTML="<p>No classes today. Rest or read notes.</p>"; return; } el.innerHTML = list.map(v=>`<div class="item"><div><b>${v.subject}</b><br><span style="color:#666">${v.room} | ${v.teacher}</span></div><div class="badge">${v.time}</div></div>`).join(""); }
+// MPYA: Kufuta Timetable - CR tu
+function deleteAllTimetable(){
+  if(!currentUser || currentUser.role !== "CR"){ alert("CR tu anaweza kufuta!"); return; }
+  if(!confirm("Uko na uhakika unataka KUFUTA RATIBA ZOTE za " + myLevel() + "?\n\nNotes, Announcement na Books HAVITAGUSWA.")) return;
+  if(!confirm("Confirm mara ya pili: Futa Ratiba ZOTE za " + myLevel() + "?")) return;
+  timetables[myLevel()] = { "Monday": [], "Tuesday": [], "Wednesday": [], "Thursday": [], "Friday": [], "Saturday": [], "Sunday": [] };
+  saveAll(); renderTimetable("auto");
+  alert("✅ Ratiba ZOTE za " + myLevel() + " zimefutwa! Sasa tengeneza mpya kwa + Add Timetable");
+}
+function deleteDayTimetable(){
+  if(!currentUser || currentUser.role !== "CR"){ alert("CR tu anaweza kufuta!"); return; }
+  const day = prompt("Andika siku unayotaka kufuta ratiba yake:\nMonday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday");
+  if(!day) return;
+  const dayClean = day.charAt(0).toUpperCase() + day.slice(1).toLowerCase();
+  if(!timetables[myLevel()][dayClean] && timetables[myLevel()][dayClean] !== undefined && !["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"].includes(dayClean)){ alert("Siku sio sahihi!"); return; }
+  if(!confirm("Futa ratiba yote ya " + dayClean + " kwa " + myLevel() + "?")) return;
+  timetables[myLevel()][dayClean] = [];
+  saveAll(); renderTimetable("auto");
+  alert("✅ Ratiba ya " + dayClean + " imefutwa!");
+}
+function deleteOneTimetable(day, index){
+  if(!currentUser || currentUser.role !== "CR") return;
+  const item = timetables[myLevel()][day][index];
+  if(!item) return;
+  if(!confirm("Futa somo hili: " + item.subject + " - " + item.time + " (" + day + ")?")) return;
+  timetables[myLevel()][day].splice(index,1);
+  saveAll(); renderTimetable(document.getElementById("daySelect").value);
+}
+function renderTimetable(choice){ const day = choice === "auto" ? getDayName() : choice; document.getElementById("todayName").textContent = day + " - " + myLevel(); let list = [...((timetables[myLevel()] && timetables[myLevel()][day]) || [])].sort((a,b)=>toMinutes(a.time)-toMinutes(b.time)); const el = document.getElementById("timetableList"); if(list.length===0){ el.innerHTML="<p>No classes today. Rest or read notes. CR anaweza kuongeza mpya hapo juu.</p>"; return; } el.innerHTML = list.map((v,idx)=>{ let delBtn = ""; if(currentUser && currentUser.role==="CR"){ let realIdx = timetables[myLevel()][day].findIndex(x=>x.subject===v.subject && x.time===v.time); delBtn = `<button onclick="deleteOneTimetable('${day}', ${realIdx})" style="background:#ff5e62;color:white;border:none;padding:6px 10px;border-radius:8px;cursor:pointer;font-weight:700;margin-left:5px">❌</button>`; } return `<div class="item"><div><b>${v.subject}</b><br><span style="color:#666">${v.room} | ${v.teacher}</span></div><div style="display:flex;align-items:center"><div class="badge">${v.time}</div>${delBtn}</div></div>`; }).join(""); }
 function renderAnnouncements(){ const day = getDayName(); const todays = (announcements[myLevel()] || []).filter(a=>a.day===day); const el = document.getElementById("announcementList"); if(todays.length===0){ el.innerHTML="<p>No announcement for today.</p>"; return; } el.innerHTML = todays.map(a=>`<div class="ann"><b>${a.day}:</b> ${a.text}</div>`).join(""); }
 function renderBooks(){ document.getElementById("bookList").innerHTML = (books[myLevel()] || []).map(b=>`<div class="item"><b>📖 ${b.title}</b><a href="${b.link}" class="btn btn-small">Download</a></div>`).join(""); }
 function renderNotes(){ const el = document.getElementById("notesList"); if(!el) return; const list = notes[myLevel()] || []; if(list.length===0){ el.innerHTML="<p>No notes yet. CR will upload soon.</p>"; return; } el.innerHTML = list.map((n,idx)=>{ let delBtn = currentUser.role==="CR" ? `<button class="btn btn-red btn-small" onclick="deleteNoteById('${n.id}')">❌</button>` : ""; if(!n.id) delBtn = currentUser.role==="CR" ? `<button class="btn btn-red btn-small" onclick="deleteNote(${idx})">❌</button>` : ""; return `<div class="item"><div><b>📄 ${n.title}</b><br><span style="color:#666;font-size:13px">${n.fileName} • ${n.subject} • by ${n.by}</span></div><div style="display:flex;gap:5px"><a href="${n.fileData}" download="${n.fileName}" class="btn btn-green btn-small">Download</a>${delBtn}</div></div>`; }).join(""); }
