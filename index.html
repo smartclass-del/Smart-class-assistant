@@ -39,22 +39,25 @@
 
   <div class="card" id="loginCard">
     <h2 style="margin:0">👋 Welcome - Login</h2>
-    <p style="color:#666">Student: Name + 4-digit Code. Example: Fadhili / 0001<br>CR: Andika Jina lako + Namba yako. Level 4: <b>IT/4-01</b> au <b>IT/4-02</b> | Level 5: <b>IT/5-01</b> au <b>IT/5-02</b> | Level 6: <b>IT/6-01</b> au <b>IT/6-02</b></p>
+    <!-- MPYA: Example zimeondolewa - hakuna Fadhili / 0001 wala IT/4-01 zinazoonekana -->
+    <p style="color:#666">Please enter your details to continue.</p>
     <label>Your Name</label>
-    <input id="loginName" placeholder="e.g. Fadhili">
+    <input id="loginName" placeholder="Your Name">
     <label>Your Code</label>
-    <input id="loginCode" placeholder="e.g. 0001 or IT/4-01" maxlength="10">
+    <input id="loginCode" placeholder="Your Code" maxlength="10">
     <label>Choose Your Level</label>
     <select id="loginLevel">
       <option value="Level 4">Level 4</option>
       <option value="Level 5" selected>Level 5</option>
       <option value="Level 6">Level 6</option>
     </select>
-    <p id="nextCodeHint" style="color:#1a73e8;font-weight:700"></p>
+    <!-- MPYA: Hint ya Next Code imefichwa pia ili example zisionekane -->
+    <p id="nextCodeHint" style="color:#1a73e8;font-weight:700;display:none"></p>
     <p id="loginError" style="color:red;font-weight:700"></p>
     <button class="btn" onclick="doLogin()">Login →</button>
     <button class="btn btn-green" onclick="doRegister()">Create My Account</button>
-    <p style="font-size:13px;color:#777">Rule: One code can be used by ONE student only in same Level. 0001 cannot be repeated.</p>
+    <!-- MPYA: Rule ya One code imefichwa - haionekani tena -->
+    <p style="font-size:13px;color:#777;display:none">Rule: One code can be used by ONE student only in same Level.</p>
   </div>
 
   <div id="app" class="hidden">
@@ -77,6 +80,8 @@
         <button class="btn" style="background:white;color:#7b2ff7" onclick="showCrForm('subject')">+ Add Subject</button>
         <button class="btn" style="background:white;color:#7b2ff7" onclick="showCrForm('announcement')">+ Add Announcement</button>
         <button class="btn" style="background:white;color:#7b2ff7" onclick="showCrForm('book')">+ Add Book</button>
+        <!-- MPYA: Kitufe cha Add Notes kutoka kwenye File za simu -->
+        <button class="btn" style="background:white;color:#7b2ff7" onclick="showCrForm('notes')">+ Add Notes 📄</button>
       </div>
       <div id="crForm" class="hidden" style="background:white;color:black;padding:15px;border-radius:14px;margin-top:12px">
         <h3 id="crFormTitle">Add</h3>
@@ -123,6 +128,13 @@
       <div id="myAttendanceList" style="margin-top:10px;background:white;color:black;padding:10px;border-radius:12px"></div>
     </div>
 
+    <!-- MPYA: Sehemu ya Notes - Wanafunzi wataona hapa -->
+    <div class="card">
+      <h2 style="margin:0">📄 Class Notes - From CR</h2>
+      <p style="color:#666;font-size:13px">Notes uploaded by CR from phone files. Tap Download to read.</p>
+      <div id="notesList"></div>
+    </div>
+
     <div class="card">
       <h2 style="margin:0">📚 E-Library</h2>
       <div id="bookList"></div>
@@ -132,7 +144,6 @@
 
 <script>
 const EXAM_DATE = "2026-12-15";
-// MPYA: Hakuna jina la CR lililowekwa - CR anaandika jina lake mwenyewe, mfumo unaangalia Namba tu
 const CR_CODES = {
   "Level 4": ["IT/4-01", "IT/4-02"],
   "Level 5": ["IT/5-01", "IT/5-02"],
@@ -165,6 +176,11 @@ if(!books || !books["Level 5"]){
   let defB = [{title:"Database Notes PDF",link:"#"}];
   books = { "Level 4": JSON.parse(JSON.stringify(defB)), "Level 5": JSON.parse(JSON.stringify(defB)), "Level 6": JSON.parse(JSON.stringify(defB)) };
 }
+// MPYA: Hifadhi ya Notes
+let notes = JSON.parse(localStorage.getItem("sc_notes") || "null");
+if(!notes || !notes["Level 5"]){
+  notes = { "Level 4": [], "Level 5": [], "Level 6": [] };
+}
 let attendance = JSON.parse(localStorage.getItem("sc_attendance") || "[]");
 let currentUser = JSON.parse(localStorage.getItem("sc_current") || "null");
 
@@ -174,6 +190,8 @@ function saveAll(){
   localStorage.setItem("sc_announcements",JSON.stringify(announcements));
   localStorage.setItem("sc_books",JSON.stringify(books));
   localStorage.setItem("sc_attendance",JSON.stringify(attendance));
+  // MPYA: Hifadhi Notes pia
+  try{ localStorage.setItem("sc_notes",JSON.stringify(notes)); }catch(e){ alert("File ni kubwa sana! Tafadhali tumia PDF ndogo chini ya 3MB."); }
 }
 function pad4(n){ return String(n).padStart(4,"0"); }
 function getNextCode(){
@@ -208,7 +226,6 @@ function doRegister(){
   const err = document.getElementById("loginError");
   if(!name || !code){ err.textContent = "Please enter Name and Code."; return; }
   if(!/^\d{4}$/.test(code)){ err.textContent = "Code must be exactly 4 digits, e.g. 0001"; return; }
-  // CR codes zote zimehifadhiwa - mwanafunzi hawezi kuzitumia
   const allCrCodes = Object.values(CR_CODES).flat();
   if(allCrCodes.includes(code)){ err.textContent = "This code is reserved for CR only."; return; }
   if(users.find(u=>u.code === code && u.level === level)){
@@ -225,21 +242,19 @@ function doRegister(){
   updateNextHint();
 }
 
-// MPYA: CR Login - Jina anaandika mwenyewe, tunaangalia Namba + Level tu
 function doLogin(){
   const name = document.getElementById("loginName").value.trim();
   const code = document.getElementById("loginCode").value.trim();
   const level = document.getElementById("loginLevel").value;
   const err = document.getElementById("loginError");
   if(!name || !code){ err.textContent = "Enter Name and Code."; return; }
-  // CR: Kama code iko kwenye list ya Level yake, ingia kama CR na jina aliloandika mwenyewe
   if(CR_CODES[level] && CR_CODES[level].includes(code)){
     currentUser = {name: name, code: code, role: "CR", level: level};
     localStorage.setItem("sc_current", JSON.stringify(currentUser));
     enterApp(); return;
   }
   const found = users.find(u => u.name.toLowerCase() === name.toLowerCase() && u.code === code && u.level === level);
-  if(!found){ err.textContent = "Wrong Name / Code / Level. Check your Level. Next free: " + getNextCode(); return; }
+  if(!found){ err.textContent = "Wrong Name / Code / Level. Check your Level."; return; }
   currentUser = found;
   localStorage.setItem("sc_current", JSON.stringify(currentUser));
   enterApp();
@@ -255,7 +270,7 @@ function enterApp(){
     document.getElementById("crLevelInfo").textContent = "You are CR for " + currentUser.level + " - Your code: " + currentUser.code + " - You can only add for " + currentUser.level;
   }
   document.getElementById("dateNow").textContent = new Date().toLocaleDateString("en-GB",{weekday:'long',year:'numeric',month:'long',day:'numeric'}) + " | " + currentUser.level + " | Auto update at 6:00 AM";
-  updateCountdown(); renderTimetable("auto"); renderAnnouncements(); renderBooks(); renderMyAttendance(); renderCRAttendance();
+  updateCountdown(); renderTimetable("auto"); renderAnnouncements(); renderBooks(); renderMyAttendance(); renderCRAttendance(); renderNotes();
 }
 function updateCountdown(){
   const today = new Date(); today.setHours(0,0,0,0);
@@ -285,6 +300,22 @@ function renderAnnouncements(){
 }
 function renderBooks(){
   document.getElementById("bookList").innerHTML = (books[myLevel()] || []).map(b=>`<div class="item"><b>📖 ${b.title}</b><a href="${b.link}" class="btn btn-small">Download</a></div>`).join("");
+}
+// MPYA: Onyesha Notes
+function renderNotes(){
+  const el = document.getElementById("notesList");
+  if(!el) return;
+  const list = notes[myLevel()] || [];
+  if(list.length===0){ el.innerHTML="<p>No notes yet. CR will upload soon.</p>"; return; }
+  el.innerHTML = list.map((n,idx)=>{
+    let delBtn = currentUser.role==="CR" ? `<button class="btn btn-red btn-small" onclick="deleteNote(${idx})">❌</button>` : "";
+    return `<div class="item"><div><b>📄 ${n.title}</b><br><span style="color:#666;font-size:13px">${n.fileName} • ${n.subject} • by ${n.by}</span></div><div style="display:flex;gap:5px"><a href="${n.fileData}" download="${n.fileName}" class="btn btn-green btn-small">Download</a>${delBtn}</div></div>`;
+  }).join("");
+}
+function deleteNote(idx){
+  if(!confirm("Delete this note?")) return;
+  notes[myLevel()].splice(idx,1);
+  saveAll(); renderNotes();
 }
 function signAttendance(){
   const today = new Date().toDateString();
@@ -343,7 +374,7 @@ let crType = "";
 function showCrForm(type){
   crType = type;
   document.getElementById("crForm").classList.remove("hidden");
-  const title = {timetable:"Add Timetable", subject:"Add Subject to Timetable", announcement:"Add Announcement", book:"Add Book"}[type];
+  const title = {timetable:"Add Timetable", subject:"Add Subject to Timetable", announcement:"Add Announcement", book:"Add Book", notes:"Add Notes - From Phone File"}[type];
   document.getElementById("crFormTitle").textContent = title + " for " + myLevel();
   let html = "";
   if(type==="timetable" || type==="subject"){
@@ -358,30 +389,14 @@ function showCrForm(type){
   } else if(type==="book"){
     html = `<input id="crBookTitle" placeholder="Book title e.g. Database Notes">
     <input id="crBookLink" placeholder="Link or #">`;
-  }
-  document.getElementById("crFormFields").innerHTML = html;
-}
-function saveCrData(){
-  if(crType==="timetable" || crType==="subject"){
-    const day = document.getElementById("crDay").value;
-    const item = {time:document.getElementById("crTime").value, subject:document.getElementById("crSubject").value, room:document.getElementById("crRoom").value, teacher:document.getElementById("crTeacher").value};
-    if(!item.subject){ alert("Enter subject"); return; }
-    if(!timetables[myLevel()]) timetables[myLevel()]={};
-    if(!timetables[myLevel()][day]) timetables[myLevel()][day]=[];
-    timetables[myLevel()][day].push(item);
-  } else if(crType==="announcement"){
-    if(!announcements[myLevel()]) announcements[myLevel()]=[];
-    announcements[myLevel()].push({day:document.getElementById("crDay").value, text:document.getElementById("crText").value});
-  } else if(crType==="book"){
-    if(!books[myLevel()]) books[myLevel()]=[];
-    books[myLevel()].push({title:document.getElementById("crBookTitle").value, link:document.getElementById("crBookLink").value || "#"});
-  }
-  saveAll();
-  document.getElementById("crForm").classList.add("hidden");
-  renderTimetable("auto"); renderAnnouncements(); renderBooks();
-  alert("Saved for " + myLevel() + "! All students in " + myLevel() + " will see it.");
-}
-if(currentUser){ enterApp(); }
-</script>
-</body>
-</html>
+  } else if(type==="notes"){
+    // MPYA: Kuchukua File kutoka kwenye simu
+    html = `<input id="crNoteTitle" placeholder="Note Title e.g. Database Chapter 1">
+    <input id="crNoteSubject" placeholder="Subject e.g. Database">
+    <label style="font-weight:700">📁 Chagua File Kutoka Kwenye Simu Yako (PDF / Picha / Word):</label>
+    <input id="crNoteFile" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,image/*" style="background:#f0f4ff">
+    <p id="noteFileName" style="font-size:13px;color:#1a73e8"></p>
+    <p style="font-size:12px;color:#888">File lazima iwe ndogo - chini ya 3MB ili isihifadhiwe vizuri.</p>`;
+    setTimeout(()=>{
+      const f = document.getElementById("crNoteFile");
+      if(f) f
