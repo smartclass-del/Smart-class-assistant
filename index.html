@@ -54,15 +54,13 @@
     <p id="loginError" style="color:red;font-weight:700"></p>
     <button class="btn" onclick="doLogin()">Login →</button>
     <button class="btn btn-green" onclick="doRegister()">Create My Account</button>
-    <p style="font-size:13px;color:#777;display:none">Rule: One code can be used by ONE student only in same Level.</p>
-    <!-- MPYA: Kusaidia kuingia tena - haibadili kingine -->
     <hr>
     <div style="background:#fff7ed;border:2px dashed #f97316;padding:12px;border-radius:12px;text-align:center">
       <b>⚠️ Huwezi kuingia?</b><br>
       <button class="btn" style="background:#f97316" onclick="showMyAccounts()">🔍 Nimesahau - Nionyeshe Akaunti Zangu</button>
       <div id="myAccountsBox" style="text-align:left;margin-top:10px"></div>
       <button class="btn btn-red btn-small" onclick="resetAllAccounts()">🗑️ Futa Zote & Anza Upya</button>
-      <p style="font-size:12px;color:#666;margin:5px 0 0">CR: Jina lako lolote + Code ya Level yako + Level sahihi. Mf: Level 5 = IT/5-01</p>
+      <p style="font-size:12px;color:#666;margin:5px 0 0">CR: Jina lako lolote + Code ya Level yako + Level sahihi.</p>
     </div>
   </div>
 
@@ -136,6 +134,7 @@
     <div class="card">
       <h2 style="margin:0">📄 Class Notes - From CR</h2>
       <p style="color:#666;font-size:13px">Notes uploaded by CR from phone files. Tap Download to read.</p>
+      <p id="notesSyncStatus" style="font-size:12px;color:#16a34a;font-weight:700">🟢 Synced - Everyone can see</p>
       <div id="notesList"></div>
     </div>
 
@@ -146,16 +145,25 @@
   </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
-const EXAM_DATE = "2026-12-15";
-const CR_CODES = {
-  "Level 4": ["IT/4-01", "IT/4-02"],
-  "Level 5": ["IT/5-01", "IT/5-02"],
-  "Level 6": ["IT/6-01", "IT/6-02"]
+// MPYA: Firebase yako sahihi ya SMART CLASS - kutoka kwenye screenshot yako
+const firebaseConfig = {
+  apiKey: "AIzaSyCgkQ-N-ASZQMQCwEGcFqNqTJLRpCjh7s",
+  authDomain: "smart-class-3a3bc.firebaseapp.com",
+  projectId: "smart-class-3a3bc",
+  storageBucket: "smart-class-3a3bc.firebasestorage.app",
+  messagingSenderId: "572243884026",
+  appId: "1:572243884026:web:1456eaf9cecc63c91ed643",
+  measurementId: "G-KB3XZSNCYN"
 };
+let db=null;
+try{ firebase.initializeApp(firebaseConfig); db=firebase.firestore(); }catch(e){ console.log("Firebase error",e); }
 
+const EXAM_DATE = "2026-12-15";
+const CR_CODES = { "Level 4": ["IT/4-01", "IT/4-02"], "Level 5": ["IT/5-01", "IT/5-02"], "Level 6": ["IT/6-01", "IT/6-02"] };
 let users = JSON.parse(localStorage.getItem("sc_users") || "[]");
-
 function defaultTimetable(){
   return {
     "Monday":[{time:"08:00",subject:"Database",room:"Room 5",teacher:"Mr. John"}],
@@ -167,306 +175,132 @@ function defaultTimetable(){
   };
 }
 let timetables = JSON.parse(localStorage.getItem("sc_timetables") || "null");
-if(!timetables || !timetables["Level 5"]){
-  timetables = { "Level 4": defaultTimetable(), "Level 5": defaultTimetable(), "Level 6": defaultTimetable() };
-}
+if(!timetables || !timetables["Level 5"]){ timetables = { "Level 4": defaultTimetable(), "Level 5": defaultTimetable(), "Level 6": defaultTimetable() }; }
 let announcements = JSON.parse(localStorage.getItem("sc_announcements") || "null");
 if(!announcements || !announcements["Level 5"]){
   let def = [{day:"Monday",text:"Welcome to new week!"},{day:"Tuesday",text:"Bring your laptop tomorrow."},{day:"Wednesday",text:"Library books must be returned today."},{day:"Thursday",text:"Project meeting at 14:00."},{day:"Friday",text:"No class after 12:00."}];
   announcements = { "Level 4": JSON.parse(JSON.stringify(def)), "Level 5": JSON.parse(JSON.stringify(def)), "Level 6": JSON.parse(JSON.stringify(def)) };
 }
 let books = JSON.parse(localStorage.getItem("sc_books") || "null");
-if(!books || !books["Level 5"]){
-  let defB = [{title:"Database Notes PDF",link:"#"}];
-  books = { "Level 4": JSON.parse(JSON.stringify(defB)), "Level 5": JSON.parse(JSON.stringify(defB)), "Level 6": JSON.parse(JSON.stringify(defB)) };
-}
+if(!books || !books["Level 5"]){ let defB = [{title:"Database Notes PDF",link:"#"}]; books = { "Level 4": JSON.parse(JSON.stringify(defB)), "Level 5": JSON.parse(JSON.stringify(defB)), "Level 6": JSON.parse(JSON.stringify(defB)) }; }
 let notes = JSON.parse(localStorage.getItem("sc_notes") || "null");
-if(!notes || !notes["Level 5"]){
-  notes = { "Level 4": [], "Level 5": [], "Level 6": [] };
-}
+if(!notes || !notes["Level 5"]){ notes = { "Level 4": [], "Level 5": [], "Level 6": [] }; }
 let attendance = JSON.parse(localStorage.getItem("sc_attendance") || "[]");
 let currentUser = JSON.parse(localStorage.getItem("sc_current") || "null");
-
 function saveAll(){
   localStorage.setItem("sc_users",JSON.stringify(users));
   localStorage.setItem("sc_timetables",JSON.stringify(timetables));
   localStorage.setItem("sc_announcements",JSON.stringify(announcements));
   localStorage.setItem("sc_books",JSON.stringify(books));
   localStorage.setItem("sc_attendance",JSON.stringify(attendance));
-  try{ localStorage.setItem("sc_notes",JSON.stringify(notes)); }catch(e){ alert("File ni kubwa sana! Tafadhali tumia PDF ndogo chini ya 3MB."); }
+  try{ localStorage.setItem("sc_notes",JSON.stringify(notes)); }catch(e){}
 }
+async function loadNotesFromServer(){
+  if(!db) return;
+  try{
+    const snap = await db.collection('smart_notes').get();
+    let serverNotes = { "Level 4": [], "Level 5": [], "Level 6": [] };
+    snap.forEach(doc=>{ let d = doc.data(); if(!serverNotes[d.level]) serverNotes[d.level]=[]; serverNotes[d.level].push({id:doc.id, ...d}); });
+    if(snap.size>0){ notes = serverNotes; try{ localStorage.setItem("sc_notes",JSON.stringify(notes)); }catch(e){} if(currentUser) renderNotes(); }
+  }catch(e){ console.log("Load notes error",e); }
+}
+function listenNotesLive(){
+  if(!db) return;
+  try{
+    db.collection('smart_notes').onSnapshot(snap=>{
+      let serverNotes = { "Level 4": [], "Level 5": [], "Level 6": [] };
+      snap.forEach(doc=>{ let d = doc.data(); if(!serverNotes[d.level]) serverNotes[d.level]=[]; serverNotes[d.level].push({id:doc.id, ...d}); });
+      notes = serverNotes;
+      try{ localStorage.setItem("sc_notes",JSON.stringify(notes)); }catch(e){}
+      if(currentUser) renderNotes();
+    });
+  }catch(e){}
+}
+loadNotesFromServer(); listenNotesLive();
 function pad4(n){ return String(n).padStart(4,"0"); }
-function getNextCode(){
-  const lvl = document.getElementById("loginLevel") ? document.getElementById("loginLevel").value : "Level 5";
-  let used = users.filter(u=>u.level===lvl).map(u=>parseInt(u.code)).filter(n=>!isNaN(n));
-  let next = 1; while(used.includes(next)) next++;
-  return pad4(next);
-}
-function updateNextHint(){
-  const el = document.getElementById("nextCodeHint");
-  if(el) el.textContent = "Next free code for this Level is: " + getNextCode();
-}
+function getNextCode(){ const lvl = document.getElementById("loginLevel") ? document.getElementById("loginLevel").value : "Level 5"; let used = users.filter(u=>u.level===lvl).map(u=>parseInt(u.code)).filter(n=>!isNaN(n)); let next = 1; while(used.includes(next)) next++; return pad4(next); }
+function updateNextHint(){ const el = document.getElementById("nextCodeHint"); if(el) el.textContent = "Next free code for this Level is: " + getNextCode(); }
 if(document.getElementById("loginLevel")) document.getElementById("loginLevel").addEventListener("change", updateNextHint);
 updateNextHint();
-
-// MPYA: Kusaidia kuingia tena
 function showMyAccounts(){
   const box = document.getElementById("myAccountsBox");
-  if(users.length===0){
-    box.innerHTML = "<p style='color:red;font-weight:700'>❌ Hakuna akaunti yoyote kwenye simu hii! Lazima ubonyeze <b>Create My Account</b> kwanza, au ingia kama CR.</p><p>CR: Jina lako + <b>IT/5-01</b> + Level 5 (kama uko Level 5)</p>";
-    return;
-  }
-  box.innerHTML = "<b>Akaunti zilizopo kwenye simu hii:</b><br>" + users.map(u=>`✅ <b>${u.name}</b> | Code: <b>${u.code}</b> | ${u.level} | <button onclick="fillLogin('${u.name}','${u.code}','${u.level}')" style='background:#16a34a;color:white;border:none;padding:4px 8px;border-radius:8px;cursor:pointer'>Tumia Hii →</button>`).join("<br>") + "<br><small>Bonyeza 'Tumia Hii' - itajaza yenyewe kisha bonyeza Login.</small>";
+  if(users.length===0){ box.innerHTML = "<p style='color:red;font-weight:700'>❌ Hakuna akaunti yoyote kwenye simu hii! Lazima ubonyeze <b>Create My Account</b> kwanza, au ingia kama CR.</p>"; return; }
+  box.innerHTML = "<b>Akaunti zilizopo kwenye simu hii:</b><br>" + users.map(u=>`✅ <b>${u.name}</b> | Code: <b>${u.code}</b> | ${u.level} | <button onclick="fillLogin('${u.name}','${u.code}','${u.level}')" style='background:#16a34a;color:white;border:none;padding:4px 8px;border-radius:8px;cursor:pointer'>Tumia Hii →</button>`).join("<br>");
 }
-function fillLogin(name,code,level){
-  document.getElementById("loginName").value = name;
-  document.getElementById("loginCode").value = code;
-  document.getElementById("loginLevel").value = level;
-  document.getElementById("loginError").textContent = "Sasa bonyeza Login →";
-  window.scrollTo(0,0);
-}
-function resetAllAccounts(){
-  if(!confirm("Uko na uhakika unataka kufuta akaunti ZOTE na kuanza upya? Timetable na Notes zako hazitafutika.")) return;
-  localStorage.removeItem("sc_users");
-  localStorage.removeItem("sc_current");
-  users = [];
-  alert("Imefutwa! Sasa tengeneza akaunti mpya: Andika Jina + Code mpya + Bonyeza Create My Account, kisha Login.");
-  location.reload();
-}
-
-function checkDailyReset(){
-  const today = new Date().toDateString();
-  const last = localStorage.getItem("sc_lastDay");
-  const nowHour = new Date().getHours();
-  if(last !== today && nowHour >= 6){ localStorage.setItem("sc_lastDay", today); }
-  if(!last) localStorage.setItem("sc_lastDay", today);
-  const now = new Date(); const six = new Date(); six.setHours(6,0,0,0);
-  if(now < six){ setTimeout(()=>location.reload(), six - now); }
-  else { setInterval(()=>{ if(new Date().toDateString() !== localStorage.getItem("sc_lastDay")) location.reload(); }, 60000); }
-}
+function fillLogin(name,code,level){ document.getElementById("loginName").value = name; document.getElementById("loginCode").value = code; document.getElementById("loginLevel").value = level; document.getElementById("loginError").textContent = "Sasa bonyeza Login →"; window.scrollTo(0,0); }
+function resetAllAccounts(){ if(!confirm("Uko na uhakika unataka kufuta akaunti ZOTE na kuanza upya?")) return; localStorage.removeItem("sc_users"); localStorage.removeItem("sc_current"); users = []; alert("Imefutwa! Sasa tengeneza akaunti mpya."); location.reload(); }
+function checkDailyReset(){ const today = new Date().toDateString(); const last = localStorage.getItem("sc_lastDay"); const nowHour = new Date().getHours(); if(last !== today && nowHour >= 6){ localStorage.setItem("sc_lastDay", today); } if(!last) localStorage.setItem("sc_lastDay", today); const now = new Date(); const six = new Date(); six.setHours(6,0,0,0); if(now < six){ setTimeout(()=>location.reload(), six - now); } else { setInterval(()=>{ if(new Date().toDateString() !== localStorage.getItem("sc_lastDay")) location.reload(); }, 60000); } }
 checkDailyReset();
-
 function doRegister(){
-  const name = document.getElementById("loginName").value.trim();
-  let code = document.getElementById("loginCode").value.trim();
-  const level = document.getElementById("loginLevel").value;
-  const err = document.getElementById("loginError");
+  const name = document.getElementById("loginName").value.trim(); let code = document.getElementById("loginCode").value.trim(); const level = document.getElementById("loginLevel").value; const err = document.getElementById("loginError");
   if(!name || !code){ err.textContent = "Please enter Name and Code."; return; }
   if(!/^\d{4}$/.test(code)){ err.textContent = "Code must be exactly 4 digits, e.g. 0001"; return; }
-  const allCrCodes = Object.values(CR_CODES).flat();
-  if(allCrCodes.includes(code)){ err.textContent = "This code is reserved for CR only."; return; }
-  if(users.find(u=>u.code === code && u.level === level)){
-    err.textContent = "Code " + code + " already used in " + level + "! Please use " + getNextCode();
-    return;
-  }
-  if(users.find(u=>u.name.toLowerCase() === name.toLowerCase() && u.level === level)){
-    err.textContent = "This name already exists in " + level + ". Use different name."; return;
-  }
-  users.push({name, code, role:"STUDENT", level: level});
-  saveAll();
-  err.textContent = "";
-  alert("Account created for " + level + "! Now click Login.");
-  updateNextHint();
+  const allCrCodes = Object.values(CR_CODES).flat(); if(allCrCodes.includes(code)){ err.textContent = "This code is reserved for CR only."; return; }
+  if(users.find(u=>u.code === code && u.level === level)){ err.textContent = "Code " + code + " already used in " + level + "! Please use " + getNextCode(); return; }
+  if(users.find(u=>u.name.toLowerCase() === name.toLowerCase() && u.level === level)){ err.textContent = "This name already exists in " + level + ". Use different name."; return; }
+  users.push({name, code, role:"STUDENT", level: level}); saveAll(); err.textContent = ""; alert("Account created for " + level + "! Now click Login."); updateNextHint();
 }
-
 function doLogin(){
-  const name = document.getElementById("loginName").value.trim();
-  const code = document.getElementById("loginCode").value.trim();
-  const level = document.getElementById("loginLevel").value;
-  const err = document.getElementById("loginError");
+  const name = document.getElementById("loginName").value.trim(); const code = document.getElementById("loginCode").value.trim(); const level = document.getElementById("loginLevel").value; const err = document.getElementById("loginError");
   if(!name || !code){ err.textContent = "Enter Name and Code."; return; }
-  if(CR_CODES[level] && CR_CODES[level].includes(code)){
-    currentUser = {name: name, code: code, role: "CR", level: level};
-    localStorage.setItem("sc_current", JSON.stringify(currentUser));
-    enterApp(); return;
-  }
+  if(CR_CODES[level] && CR_CODES[level].includes(code)){ currentUser = {name: name, code: code, role: "CR", level: level}; localStorage.setItem("sc_current", JSON.stringify(currentUser)); enterApp(); return; }
   const found = users.find(u => u.name.toLowerCase() === name.toLowerCase() && u.code === code && u.level === level);
-  if(!found){ err.textContent = "Wrong Name / Code / Level. Bonyeza chini 'Nimesahau - Nionyeshe Akaunti Zangu' kuona akaunti zako sahihi."; return; }
-  currentUser = found;
-  localStorage.setItem("sc_current", JSON.stringify(currentUser));
-  enterApp();
+  if(!found){ err.textContent = "Wrong Name / Code / Level. Bonyeza chini 'Nimesahau - Nionyeshe Akaunti Zangu'"; return; }
+  currentUser = found; localStorage.setItem("sc_current", JSON.stringify(currentUser)); enterApp();
 }
 function doLogout(){ localStorage.removeItem("sc_current"); currentUser = null; location.reload(); }
 function enterApp(){
-  document.getElementById("loginCard").classList.add("hidden");
-  document.getElementById("app").classList.remove("hidden");
+  document.getElementById("loginCard").classList.add("hidden"); document.getElementById("app").classList.remove("hidden");
   document.getElementById("welcomeName").textContent = "Hello, " + currentUser.name + " - " + currentUser.level;
   document.getElementById("roleLabel").textContent = currentUser.role === "CR" ? "CR - CLASS REP" : "STUDENT";
-  if(currentUser.role === "CR"){
-    document.getElementById("crPanel").classList.remove("hidden");
-    document.getElementById("crLevelInfo").textContent = "You are CR for " + currentUser.level + " - Your code: " + currentUser.code + " - You can only add for " + currentUser.level;
-  }
+  if(currentUser.role === "CR"){ document.getElementById("crPanel").classList.remove("hidden"); document.getElementById("crLevelInfo").textContent = "You are CR for " + currentUser.level + " - Your code: " + currentUser.code; }
   document.getElementById("dateNow").textContent = new Date().toLocaleDateString("en-GB",{weekday:'long',year:'numeric',month:'long',day:'numeric'}) + " | " + currentUser.level + " | Auto update at 6:00 AM";
-  updateCountdown(); renderTimetable("auto"); renderAnnouncements(); renderBooks(); renderMyAttendance(); renderCRAttendance(); renderNotes();
+  updateCountdown(); renderTimetable("auto"); renderAnnouncements(); renderBooks(); renderMyAttendance(); renderCRAttendance(); renderNotes(); loadNotesFromServer();
 }
-function updateCountdown(){
-  const today = new Date(); today.setHours(0,0,0,0);
-  const exam = new Date(EXAM_DATE); exam.setHours(0,0,0,0);
-  const days = Math.ceil((exam - today)/(1000*60*60*24));
-  document.getElementById("countDays").textContent = days > 0 ? days + " DAYS" : (days===0 ? "TODAY!" : "PASSED");
-  document.getElementById("countMsg").textContent = days > 0 ? "Study today, time is going!" : "Exam date: " + EXAM_DATE;
-  document.getElementById("countDate").textContent = "Exam Date: " + EXAM_DATE;
-}
+function updateCountdown(){ const today = new Date(); today.setHours(0,0,0,0); const exam = new Date(EXAM_DATE); exam.setHours(0,0,0,0); const days = Math.ceil((exam - today)/(1000*60*60*24)); document.getElementById("countDays").textContent = days > 0 ? days + " DAYS" : (days===0 ? "TODAY!" : "PASSED"); document.getElementById("countMsg").textContent = days > 0 ? "Study today, time is going!" : "Exam date: " + EXAM_DATE; document.getElementById("countDate").textContent = "Exam Date: " + EXAM_DATE; }
 function toMinutes(t){ const p=t.split(":"); return parseInt(p[0])*60+parseInt(p[1]); }
 function getDayName(){ return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][new Date().getDay()]; }
 function myLevel(){ return currentUser && currentUser.level ? currentUser.level : "Level 5"; }
-function renderTimetable(choice){
-  const day = choice === "auto" ? getDayName() : choice;
-  document.getElementById("todayName").textContent = day + " - " + myLevel();
-  let list = [...((timetables[myLevel()] && timetables[myLevel()][day]) || [])].sort((a,b)=>toMinutes(a.time)-toMinutes(b.time));
-  const el = document.getElementById("timetableList");
-  if(list.length===0){ el.innerHTML="<p>No classes today. Rest or read notes.</p>"; return; }
-  el.innerHTML = list.map(v=>`<div class="item"><div><b>${v.subject}</b><br><span style="color:#666">${v.room} | ${v.teacher}</span></div><div class="badge">${v.time}</div></div>`).join("");
-}
-function renderAnnouncements(){
-  const day = getDayName();
-  const todays = (announcements[myLevel()] || []).filter(a=>a.day===day);
-  const el = document.getElementById("announcementList");
-  if(todays.length===0){ el.innerHTML="<p>No announcement for today.</p>"; return; }
-  el.innerHTML = todays.map(a=>`<div class="ann"><b>${a.day}:</b> ${a.text}</div>`).join("");
-}
-function renderBooks(){
-  document.getElementById("bookList").innerHTML = (books[myLevel()] || []).map(b=>`<div class="item"><b>📖 ${b.title}</b><a href="${b.link}" class="btn btn-small">Download</a></div>`).join("");
-}
-function renderNotes(){
-  const el = document.getElementById("notesList");
-  if(!el) return;
-  const list = notes[myLevel()] || [];
-  if(list.length===0){ el.innerHTML="<p>No notes yet. CR will upload soon.</p>"; return; }
-  el.innerHTML = list.map((n,idx)=>{
-    let delBtn = currentUser.role==="CR" ? `<button class="btn btn-red btn-small" onclick="deleteNote(${idx})">❌</button>` : "";
-    return `<div class="item"><div><b>📄 ${n.title}</b><br><span style="color:#666;font-size:13px">${n.fileName} • ${n.subject} • by ${n.by}</span></div><div style="display:flex;gap:5px"><a href="${n.fileData}" download="${n.fileName}" class="btn btn-green btn-small">Download</a>${delBtn}</div></div>`;
-  }).join("");
-}
-function deleteNote(idx){
-  if(!confirm("Delete this note?")) return;
-  notes[myLevel()].splice(idx,1);
-  saveAll(); renderNotes();
-}
-function signAttendance(){
-  const today = new Date().toDateString();
-  const exists = attendance.find(a=>a.name===currentUser.name && a.date===today && a.level===myLevel());
-  if(exists){ alert("You already signed today!"); return; }
-  attendance.push({name:currentUser.name, code:currentUser.code, date:today, level:myLevel(), time:new Date().toLocaleTimeString(), subject:"Today"});
-  saveAll(); renderMyAttendance(); renderCRAttendance();
-  alert("Welcome! You are marked PRESENT.");
-}
-function renderMyAttendance(){
-  const today = new Date().toDateString();
-  const mine = attendance.filter(a=>a.name===currentUser.name && a.level===myLevel());
-  const todayMine = mine.find(a=>a.date===today);
-  document.getElementById("myAttendanceStatus").textContent = todayMine ? "✅ You are PRESENT today at " + todayMine.time : "❌ You have NOT signed today yet.";
-  document.getElementById("myAttendanceList").innerHTML = mine.length ? mine.map(m=>`<div>✅ ${m.date} - ${m.time}</div>`).join("") : "No attendance yet.";
-}
-function renderCRAttendance(){
-  const today = new Date().toDateString();
-  const todays = attendance.filter(a=>a.date===today && a.level===myLevel());
-  const el = document.getElementById("crAttendance");
-  if(!el) return;
-  if(todays.length===0){
-    el.innerHTML = "No one has signed today yet.";
-  } else {
-    el.innerHTML = todays.map((a) => {
-      const realIndex = attendance.findIndex(x => x.name===a.name && x.date===a.date && x.level===a.level && x.time===a.time);
-      return `<div style="display:flex;justify-content:space-between;align-items:center;border:1px solid #eee;padding:8px;border-radius:10px;margin-bottom:6px;background:#f9faff">
-        <span>✅ ${a.name} (${a.code}) - ${a.time}</span>
-        <button onclick="removeAttendance(${realIndex})" style="background:#ff5e62;color:white;border:none;padding:6px 10px;border-radius:8px;cursor:pointer;font-weight:700">❌ Remove</button>
-      </div>`;
-    }).join("");
-  }
-  document.getElementById("crAttendanceCount").textContent = "Present today in " + myLevel() + ": " + todays.length;
-}
-function removeAttendance(index){
-  const person = attendance[index];
-  if(!person) return;
-  if(!confirm("Remove " + person.name + "? He signed but is NOT in class?")){
-    return;
-  }
-  attendance.splice(index, 1);
-  saveAll();
-  renderCRAttendance();
-  renderMyAttendance();
-  alert(person.name + " removed. He is now marked ABSENT.");
-}
-function exportExcel(){
-  const today = new Date().toDateString();
-  const todays = attendance.filter(a=>a.date===today && a.level===myLevel());
-  let csv = "Name,Code,Level,Date,Time\n";
-  todays.forEach(a=> csv += `${a.name},${a.code},${a.level},${a.date},${a.time}\n`);
-  const blob = new Blob([csv],{type:"text/csv"});
-  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "attendance-"+myLevel()+"-"+today+".csv"; a.click();
-}
+function renderTimetable(choice){ const day = choice === "auto" ? getDayName() : choice; document.getElementById("todayName").textContent = day + " - " + myLevel(); let list = [...((timetables[myLevel()] && timetables[myLevel()][day]) || [])].sort((a,b)=>toMinutes(a.time)-toMinutes(b.time)); const el = document.getElementById("timetableList"); if(list.length===0){ el.innerHTML="<p>No classes today. Rest or read notes.</p>"; return; } el.innerHTML = list.map(v=>`<div class="item"><div><b>${v.subject}</b><br><span style="color:#666">${v.room} | ${v.teacher}</span></div><div class="badge">${v.time}</div></div>`).join(""); }
+function renderAnnouncements(){ const day = getDayName(); const todays = (announcements[myLevel()] || []).filter(a=>a.day===day); const el = document.getElementById("announcementList"); if(todays.length===0){ el.innerHTML="<p>No announcement for today.</p>"; return; } el.innerHTML = todays.map(a=>`<div class="ann"><b>${a.day}:</b> ${a.text}</div>`).join(""); }
+function renderBooks(){ document.getElementById("bookList").innerHTML = (books[myLevel()] || []).map(b=>`<div class="item"><b>📖 ${b.title}</b><a href="${b.link}" class="btn btn-small">Download</a></div>`).join(""); }
+function renderNotes(){ const el = document.getElementById("notesList"); if(!el) return; const list = notes[myLevel()] || []; if(list.length===0){ el.innerHTML="<p>No notes yet. CR will upload soon.</p>"; return; } el.innerHTML = list.map((n,idx)=>{ let delBtn = currentUser.role==="CR" ? `<button class="btn btn-red btn-small" onclick="deleteNoteById('${n.id}')">❌</button>` : ""; if(!n.id) delBtn = currentUser.role==="CR" ? `<button class="btn btn-red btn-small" onclick="deleteNote(${idx})">❌</button>` : ""; return `<div class="item"><div><b>📄 ${n.title}</b><br><span style="color:#666;font-size:13px">${n.fileName} • ${n.subject} • by ${n.by}</span></div><div style="display:flex;gap:5px"><a href="${n.fileData}" download="${n.fileName}" class="btn btn-green btn-small">Download</a>${delBtn}</div></div>`; }).join(""); }
+async function deleteNote(idx){ if(!confirm("Delete this note?")) return; notes[myLevel()].splice(idx,1); saveAll(); renderNotes(); }
+async function deleteNoteById(id){ if(!confirm("Delete this note kwa wote?")) return; try{ if(db) await db.collection('smart_notes').doc(id).delete(); }catch(e){} for(let lvl in notes){ notes[lvl] = notes[lvl].filter(n=>n.id!==id); } saveAll(); renderNotes(); }
+function signAttendance(){ const today = new Date().toDateString(); const exists = attendance.find(a=>a.name===currentUser.name && a.date===today && a.level===myLevel()); if(exists){ alert("You already signed today!"); return; } attendance.push({name:currentUser.name, code:currentUser.code, date:today, level:myLevel(), time:new Date().toLocaleTimeString(), subject:"Today"}); saveAll(); renderMyAttendance(); renderCRAttendance(); alert("Welcome! You are marked PRESENT."); }
+function renderMyAttendance(){ const today = new Date().toDateString(); const mine = attendance.filter(a=>a.name===currentUser.name && a.level===myLevel()); const todayMine = mine.find(a=>a.date===today); document.getElementById("myAttendanceStatus").textContent = todayMine ? "✅ You are PRESENT today at " + todayMine.time : "❌ You have NOT signed today yet."; document.getElementById("myAttendanceList").innerHTML = mine.length ? mine.map(m=>`<div>✅ ${m.date} - ${m.time}</div>`).join("") : "No attendance yet."; }
+function renderCRAttendance(){ const today = new Date().toDateString(); const todays = attendance.filter(a=>a.date===today && a.level===myLevel()); const el = document.getElementById("crAttendance"); if(!el) return; if(todays.length===0){ el.innerHTML = "No one has signed today yet."; } else { el.innerHTML = todays.map((a) => { const realIndex = attendance.findIndex(x => x.name===a.name && x.date===a.date && x.level===a.level && x.time===a.time); return `<div style="display:flex;justify-content:space-between;align-items:center;border:1px solid #eee;padding:8px;border-radius:10px;margin-bottom:6px;background:#f9faff"><span>✅ ${a.name} (${a.code}) - ${a.time}</span><button onclick="removeAttendance(${realIndex})" style="background:#ff5e62;color:white;border:none;padding:6px 10px;border-radius:8px;cursor:pointer;font-weight:700">❌ Remove</button></div>`; }).join(""); } document.getElementById("crAttendanceCount").textContent = "Present today in " + myLevel() + ": " + todays.length; }
+function removeAttendance(index){ const person = attendance[index]; if(!person) return; if(!confirm("Remove " + person.name + "? He signed but is NOT in class?")){ return; } attendance.splice(index, 1); saveAll(); renderCRAttendance(); renderMyAttendance(); alert(person.name + " removed. He is now marked ABSENT."); }
+function exportExcel(){ const today = new Date().toDateString(); const todays = attendance.filter(a=>a.date===today && a.level===myLevel()); let csv = "Name,Code,Level,Date,Time\n"; todays.forEach(a=> csv += `${a.name},${a.code},${a.level},${a.date},${a.time}\n`); const blob = new Blob([csv],{type:"text/csv"}); const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "attendance-"+myLevel()+"-"+today+".csv"; a.click(); }
 let crType = "";
 function showCrForm(type){
-  crType = type;
-  document.getElementById("crForm").classList.remove("hidden");
+  crType = type; document.getElementById("crForm").classList.remove("hidden");
   const title = {timetable:"Add Timetable", subject:"Add Subject to Timetable", announcement:"Add Announcement", book:"Add Book", notes:"Add Notes - From Phone File"}[type];
   document.getElementById("crFormTitle").textContent = title + " for " + myLevel();
   let html = "";
-  if(type==="timetable" || type==="subject"){
-    html = `<select id="crDay"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select>
-    <input id="crTime" type="time" value="08:00">
-    <input id="crSubject" placeholder="Subject e.g. Database">
-    <input id="crRoom" placeholder="Room e.g. Room 5">
-    <input id="crTeacher" placeholder="Teacher e.g. Mr. John">`;
-  } else if(type==="announcement"){
-    html = `<select id="crDay"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option></select>
-    <textarea id="crText" placeholder="Announcement for that day..."></textarea>`;
-  } else if(type==="book"){
-    html = `<input id="crBookTitle" placeholder="Book title e.g. Database Notes">
-    <input id="crBookLink" placeholder="Link or #">`;
-  } else if(type==="notes"){
-    html = `<input id="crNoteTitle" placeholder="Note Title e.g. Database Chapter 1">
-    <input id="crNoteSubject" placeholder="Subject e.g. Database">
-    <label style="font-weight:700">📁 Chagua File Kutoka Kwenye Simu Yako (PDF / Picha / Word):</label>
-    <input id="crNoteFile" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,image/*" style="background:#f0f4ff">
-    <p id="noteFileName" style="font-size:13px;color:#1a73e8"></p>
-    <p style="font-size:12px;color:#888">File lazima iwe ndogo - chini ya 3MB ili isihifadhiwe vizuri.</p>`;
-    setTimeout(()=>{
-      const f = document.getElementById("crNoteFile");
-      if(f) f.onchange = ()=>{ if(f.files[0]) document.getElementById("noteFileName").textContent = "✅ Umechagua: " + f.files[0].name + " (" + Math.round(f.files[0].size/1024) + " KB)"; };
-    },100);
-  }
+  if(type==="timetable" || type==="subject"){ html = `<select id="crDay"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select><input id="crTime" type="time" value="08:00"><input id="crSubject" placeholder="Subject e.g. Database"><input id="crRoom" placeholder="Room e.g. Room 5"><input id="crTeacher" placeholder="Teacher e.g. Mr. John">`; }
+  else if(type==="announcement"){ html = `<select id="crDay"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option></select><textarea id="crText" placeholder="Announcement for that day..."></textarea>`; }
+  else if(type==="book"){ html = `<input id="crBookTitle" placeholder="Book title e.g. Database Notes"><input id="crBookLink" placeholder="Link or #">`; }
+  else if(type==="notes"){ html = `<input id="crNoteTitle" placeholder="Note Title e.g. Database Chapter 1"><input id="crNoteSubject" placeholder="Subject e.g. Database"><label style="font-weight:700">📁 Chagua File Kutoka Kwenye Simu Yako (PDF / Picha / Word):</label><input id="crNoteFile" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,image/*" style="background:#f0f4ff"><p id="noteFileName" style="font-size:13px;color:#1a73e8"></p><p style="font-size:12px;color:#888">Sasa Notes zinatumwa kwa Server - kila mtu ataona. File chini ya 800KB.</p>`; setTimeout(()=>{ const f = document.getElementById("crNoteFile"); if(f) f.onchange = ()=>{ if(f.files[0]) document.getElementById("noteFileName").textContent = "✅ Umechagua: " + f.files[0].name + " (" + Math.round(f.files[0].size/1024) + " KB)"; }; },100); }
   document.getElementById("crFormFields").innerHTML = html;
 }
 function saveCrData(){
-  if(crType==="timetable" || crType==="subject"){
-    const day = document.getElementById("crDay").value;
-    const item = {time:document.getElementById("crTime").value, subject:document.getElementById("crSubject").value, room:document.getElementById("crRoom").value, teacher:document.getElementById("crTeacher").value};
-    if(!item.subject){ alert("Enter subject"); return; }
-    if(!timetables[myLevel()]) timetables[myLevel()]={};
-    if(!timetables[myLevel()][day]) timetables[myLevel()][day]=[];
-    timetables[myLevel()][day].push(item);
-  } else if(crType==="announcement"){
-    if(!announcements[myLevel()]) announcements[myLevel()]=[];
-    announcements[myLevel()].push({day:document.getElementById("crDay").value, text:document.getElementById("crText").value});
-  } else if(crType==="book"){
-    if(!books[myLevel()]) books[myLevel()]=[];
-    books[myLevel()].push({title:document.getElementById("crBookTitle").value, link:document.getElementById("crBookLink").value || "#"});
-  } else if(crType==="notes"){
-    const title = document.getElementById("crNoteTitle").value.trim();
-    const subject = document.getElementById("crNoteSubject").value.trim();
-    const fileInput = document.getElementById("crNoteFile");
-    if(!title){ alert("Andika Title ya Note"); return; }
-    if(!fileInput.files || !fileInput.files[0]){ alert("Chagua File kwanza kutoka kwenye simu yako!"); return; }
-    const file = fileInput.files[0];
-    if(file.size > 3*1024*1024){ alert("File ni kubwa sana! Tafadhali tumia chini ya 3MB."); return; }
+  if(crType==="timetable" || crType==="subject"){ const day = document.getElementById("crDay").value; const item = {time:document.getElementById("crTime").value, subject:document.getElementById("crSubject").value, room:document.getElementById("crRoom").value, teacher:document.getElementById("crTeacher").value}; if(!item.subject){ alert("Enter subject"); return; } if(!timetables[myLevel()]) timetables[myLevel()]={}; if(!timetables[myLevel()][day]) timetables[myLevel()][day]=[]; timetables[myLevel()][day].push(item); }
+  else if(crType==="announcement"){ if(!announcements[myLevel()]) announcements[myLevel()]=[]; announcements[myLevel()].push({day:document.getElementById("crDay").value, text:document.getElementById("crText").value}); }
+  else if(crType==="book"){ if(!books[myLevel()]) books[myLevel()]=[]; books[myLevel()].push({title:document.getElementById("crBookTitle").value, link:document.getElementById("crBookLink").value || "#"}); }
+  else if(crType==="notes"){
+    const title = document.getElementById("crNoteTitle").value.trim(); const subject = document.getElementById("crNoteSubject").value.trim(); const fileInput = document.getElementById("crNoteFile");
+    if(!title){ alert("Andika Title ya Note"); return; } if(!fileInput.files || !fileInput.files[0]){ alert("Chagua File kwanza!"); return; }
+    const file = fileInput.files[0]; if(file.size > 800*1024){ alert("File ni kubwa sana! Tumia chini ya 800KB."); return; }
     const reader = new FileReader();
-    reader.onload = function(e){
-      if(!notes[myLevel()]) notes[myLevel()]=[];
-      notes[myLevel()].push({title:title, subject:subject||"General", fileName:file.name, fileData:e.target.result, by:currentUser.name, date:new Date().toDateString()});
-      saveAll();
-      document.getElementById("crForm").classList.add("hidden");
-      renderNotes();
-      alert("✅ Notes imeongezwa! Wanafunzi wa " + myLevel() + " wataiona sasa.");
+    reader.onload = async function(e){
+      let newNote = {title:title, subject:subject||"General", fileName:file.name, fileData:e.target.result, by:currentUser.name, level:myLevel(), date:new Date().toDateString()};
+      try{ if(db){ await db.collection('smart_notes').add(newNote); document.getElementById("crForm").classList.add("hidden"); alert("✅ Notes imetumwa kwa Server! Sasa kila mtu ataiona."); return; } }catch(err){ alert("Server imeshindwa: "+err.message); }
+      if(!notes[myLevel()]) notes[myLevel()]=[]; notes[myLevel()].push(newNote); saveAll(); document.getElementById("crForm").classList.add("hidden"); renderNotes(); alert("✅ Notes imeongezwa!");
     };
-    reader.readAsDataURL(file);
-    return;
+    reader.readAsDataURL(file); return;
   }
-  saveAll();
-  document.getElementById("crForm").classList.add("hidden");
-  renderTimetable("auto"); renderAnnouncements(); renderBooks(); renderNotes();
-  alert("Saved for " + myLevel() + "! All students in " + myLevel() + " will see it.");
+  saveAll(); document.getElementById("crForm").classList.add("hidden"); renderTimetable("auto"); renderAnnouncements(); renderBooks(); renderNotes(); alert("Saved for " + myLevel() + "!");
 }
 if(currentUser){ enterApp(); }
 </script>
